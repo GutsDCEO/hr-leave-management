@@ -1,0 +1,112 @@
+@startuml
+' ====================== Inheritance Hierarchy (Generalization) ======================
+class User {
+  + id: Long
+  + name: String
+  + email: String
+  + role: String
+}
+
+class Employee {
+  + department: String
+  + position: String
+}
+
+class Manager {
+  + team: String
+}
+
+class Admin {
+  + permissions: List<String>
+}
+
+User <|-- Employee
+User <|-- Manager
+User <|-- Admin
+
+' ====================== Domain Model (Composition/Aggregation) ======================
+class LeaveRequest {
+  - id: Long
+  - startDate: LocalDate
+  - endDate: LocalDate
+  - status: String
+  - reason: String
+}
+
+class Attendance {
+  - id: Long
+  - date: LocalDate
+  - clockIn: LocalTime
+  - clockOut: LocalTime
+}
+
+'Agregation (Employee can exist without LeaveRequests)'
+Employee "1" --> "0..*" LeaveRequest : submits
+Employee "1" --> "0..*" Attendance : records
+
+' ====================== Service Layer (Interface Implementation) ======================
+interface EmployeeService {
+  + createEmployee(employee: Employee): Employee
+  + getAllEmployees(): List<Employee>
+}
+
+interface LeaveService {
+  + submitRequest(request: LeaveRequest): LeaveRequest
+  + approveRequest(requestId: Long): LeaveRequest
+}
+
+class EmployeeServiceImpl {
+  - employeeRepository: EmployeeRepository
+  + createEmployee(employee: Employee): Employee
+  + getAllEmployees(): List<Employee>
+}
+
+class LeaveServiceImpl {
+  - leaveRepository: LeaveRepository
+  - policyValidator: LeavePolicyValidator
+  + submitRequest(request: LeaveRequest): LeaveRequest
+  + approveRequest(requestId: Long): LeaveRequest
+}
+
+EmployeeServiceImpl .up.|> EmployeeService : implements
+LeaveServiceImpl .up.|> LeaveService : implements
+
+' ====================== Repository Layer (Dependency Inversion) ======================
+interface EmployeeRepository {
+  + save(employee: Employee): Employee
+  + findAll(): List<Employee>
+}
+
+interface LeaveRepository {
+  + save(request: LeaveRequest): LeaveRequest
+  + findById(id: Long): LeaveRequest
+}
+
+class JpaEmployeeRepository {
+  + save(employee: Employee): Employee
+  + findAll(): List<Employee>
+}
+
+class JpaLeaveRepository {
+  + save(request: LeaveRequest): LeaveRequest
+  + findById(id: Long): LeaveRequest
+}
+
+JpaEmployeeRepository .up.|> EmployeeRepository : implements
+JpaLeaveRepository .up.|> LeaveRepository : implements
+
+EmployeeServiceImpl --> EmployeeRepository : depends on
+LeaveServiceImpl --> LeaveRepository : depends on
+LeaveServiceImpl --> LeavePolicyValidator : depends on
+
+' ====================== Policy Validation (Open/Closed Principle) ======================
+interface LeavePolicyValidator {
+  + validate(request: LeaveRequest): boolean
+}
+
+class BasicLeavePolicyValidator {
+  + validate(request: LeaveRequest): boolean
+}
+
+BasicLeavePolicyValidator .up.|> LeavePolicyValidator : implements
+@enduml

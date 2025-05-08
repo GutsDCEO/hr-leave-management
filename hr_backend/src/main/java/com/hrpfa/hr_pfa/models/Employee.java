@@ -7,7 +7,7 @@ import java.io.Serializable;
 // NOTE :
 // We use the @Entity to map this class to the database
 @Entity
-public class Employee implements Serializable {
+public class Employee extends User implements Serializable {
 
     // NOTE :
     // This Serializable will serve later to transform the java class into different types of Stream because this class is going to be saved in the database and then it's gonna be sent to the frontend as json and this Serialization will help with the whole Process
