@@ -1,5 +1,6 @@
-package com.hrpfa.hr_pfa.security;
+package com.hrpfa.hr_pfa.security.filter;
 
+import com.hrpfa.hr_pfa.security.jwt.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

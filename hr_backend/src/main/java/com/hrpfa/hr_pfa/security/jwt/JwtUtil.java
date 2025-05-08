@@ -1,4 +1,4 @@
-package com.hrpfa.hr_pfa.security;
+package com.hrpfa.hr_pfa.security.jwt;
 
 
 import io.jsonwebtoken.Claims;

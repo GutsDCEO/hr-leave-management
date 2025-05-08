@@ -1,5 +1,6 @@
-package com.hrpfa.hr_pfa.security;
+package com.hrpfa.hr_pfa.config;
 
+import com.hrpfa.hr_pfa.security.filter.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
