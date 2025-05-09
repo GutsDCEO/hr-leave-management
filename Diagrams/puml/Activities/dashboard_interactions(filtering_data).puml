@@ -1,37 +1,77 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Dashboard Interactions - Filtering Data
 
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
+:User navigates to dashboard;
+:Load default data (e.g., current month);
+
+partition "Apply Filters" {
+  repeat
+    :Select filter type:
+    - Date range
+    - Department
+    - Leave type
+    - Status;
+
+    if (Filter type == Date range?) then (Yes)
+      :Select start/end dates;
+      if (Invalid date range?) then (Yes)
+        :Show "Invalid dates" error;
+        stop
+      else (No)
+        :Apply date filter;
+      endif
+    else if (Filter type == Department?) then (Yes)
+      :Select department(s);
+      :Apply department filter;
+    else if (Filter type == Leave type?) then (Yes)
+      :Select leave type(s);
+      :Apply leave filter;
+    else if (Filter type == Status?) then (Yes)
+      :Select status(es);
+      :Apply status filter;
+    endif
+
+    -> Send request to backend;
+  repeat while (Add another filter?) is (Yes)
+  -> No;
+}
+
+partition "Backend Processing" {
+  :Validate filters + authorization;
+  if (Unauthorized access?) then (Yes)
+    :Return 403 Forbidden;
+    stop
+  else (No)
+    :Query database with filters;
+    if (No results?) then (Yes)
+      :Return 204 No Content;
+      :Show "No matches" message;
       stop
+    else (No)
+      :Aggregate data for:
+      - Charts (leave trends)
+      - Tables (raw data)
+      - Stats cards (totals);
+      :Return 200 OK + JSON;
     endif
-
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
   endif
-else (false)
-endif
+}
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
+partition "Frontend Display" {
+  :Render visualizations;
+  :Enable interactions:
+    - Hover tooltips
+    - Click drill-down
+    - Export buttons;
+
+  if (User wants new filters?) then (Yes)
+    -> Apply Filters;
+  else (No)
+    :Continue analysis;
+    stop
   endif
-endif
+}
 
 stop
-
 @enduml

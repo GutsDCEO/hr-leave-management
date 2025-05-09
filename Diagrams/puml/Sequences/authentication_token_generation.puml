@@ -1,11 +1,55 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+actor User
+participant "Angular UI" as UI
+participant "AuthController" as Controller
+participant "AuthServiceImpl" as Service
+participant "UserRepository" as Repository
+participant "BCrypt" as BCrypt
+participant "JwtUtil" as JWT
 
-autonumber
+User -> UI: Enters email/password\n(employee@hr.com, ******)
+UI -> Controller: POST /api/auth/login\n{email, password}
+activate Controller
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+Controller -> Service: login(email, password)
+activate Service
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+Service -> Repository: findByEmail(email)
+activate Repository
+
+Repository --> Service: userEntity (or null)
+deactivate Repository
+
+alt User exists
+  Service -> BCrypt: matches(rawPassword,\nhashedPassword)
+  activate BCrypt
+  BCrypt --> Service: true/false
+  deactivate BCrypt
+
+  alt Password valid
+    Service -> JWT: generateToken(\nemail=user.email,\nrole=user.role)
+    activate JWT
+    JWT --> Service: "eyJhbGciOiJIUzI1Ni..."
+    deactivate JWT
+
+    Service --> Controller: AuthResponse(token, role)
+  else Password invalid
+    Service --> Controller: Error 401 "Invalid credentials"
+  end
+else User not found
+  Service --> Controller: Error 404 "User not registered"
+end
+
+deactivate Service
+
+alt Success case
+  Controller --> UI: 200 OK + {token, role}
+  UI -> UI: Store token in localStorage\nSet Angular auth headers
+  UI -> User: Redirect to /dashboard\n(based on role)
+else Error case
+  Controller --> UI: 4xx Error + message
+  UI -> User: Show red error toast
+end
+
+deactivate Controller
 @enduml

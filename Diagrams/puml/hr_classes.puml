@@ -1,112 +1,164 @@
 @startuml
-' ====================== Inheritance Hierarchy (Generalization) ======================
-class User {
-  + id: Long
-  + name: String
-  + email: String
-  + role: String
+' ####################### PACKAGES #######################
+package "Security" {
+  class User {
+    + id: Long
+    + email: String
+    + password: String
+    + role: String
+  }
+
+  class SecurityConfig {
+    + configure(http: HttpSecurity): void
+    + userDetailsService(): UserDetailsService
+  }
+
+  class JwtUtil {
+    + generateToken(userDetails: UserDetails): String
+    + extractUsername(token: String): String
+    + validateToken(token: String): Boolean
+  }
+
+  class JwtAuthFilter {
+    + doFilterInternal(request, response, chain): void
+  }
 }
 
-class Employee {
-  + department: String
-  + position: String
+package "Authentication" {
+  interface AuthService {
+    + login(email: String, password: String): AuthResponse
+  }
+
+  class AuthServiceImpl {
+    - userRepository: UserRepository
+    - jwtUtil: JwtUtil
+    + login(...): AuthResponse
+  }
+
+  interface UserRepository {
+    + findByEmail(email: String): User
+  }
+
+  class JpaUserRepository {
+    + findByEmail(...): User
+  }
+
+  class AuthRequest {
+    + email: String
+    + password: String
+  }
+
+  class AuthResponse {
+    + token: String
+    + role: String
+  }
 }
 
-class Manager {
-  + team: String
+package "Leave Management" {
+  class LeaveRequest {
+    + id: Long
+    + startDate: LocalDate
+    + endDate: LocalDate
+    + status: String
+    + reason: String
+  }
+
+  interface LeaveService {
+    + submitRequest(request: LeaveRequestDTO): LeaveRequest
+    + approveRequest(id: Long): void
+  }
+
+  class LeaveServiceImpl {
+    - leaveRepository: LeaveRepository
+    - policyValidator: LeavePolicyValidator
+    + submitRequest(...): LeaveRequest
+  }
+
+  interface LeaveRepository {
+    + save(...): LeaveRequest
+  }
+
+  class JpaLeaveRepository {
+    + save(...): LeaveRequest
+  }
+
+  interface LeavePolicyValidator {
+    + validate(request: LeaveRequestDTO): boolean
+  }
+
+  class BasicLeavePolicyValidator {
+    + validate(...): boolean
+  }
+
+  class LeaveRequestDTO {
+    + startDate: LocalDate
+    + endDate: LocalDate
+    + reason: String
+  }
 }
 
-class Admin {
-  + permissions: List<String>
+package "Attendance" {
+  class Attendance {
+    + id: Long
+    + clockIn: LocalDateTime
+    + clockOut: LocalDateTime
+  }
+
+  interface AttendanceService {
+    + clockIn(user: User): void
+    + clockOut(user: User): void
+  }
+
+  class AttendanceServiceImpl {
+    - attendanceRepository: AttendanceRepository
+    + clockIn(...): void
+  }
+
+  interface AttendanceRepository {
+    + save(...): Attendance
+  }
 }
 
-User <|-- Employee
-User <|-- Manager
-User <|-- Admin
+package "Dashboard" {
+  class DashboardService {
+    + getFilteredData(filters: FilterDTO): DashboardDataDTO
+  }
 
-' ====================== Domain Model (Composition/Aggregation) ======================
-class LeaveRequest {
-  - id: Long
-  - startDate: LocalDate
-  - endDate: LocalDate
-  - status: String
-  - reason: String
+  class FilterDTO {
+    + startDate: LocalDate
+    + endDate: LocalDate
+    + department: String
+  }
+
+  class DashboardDataDTO {
+    + chartData: Map<String, Integer>
+    + tableData: List<LeaveRequest>
+  }
 }
 
-class Attendance {
-  - id: Long
-  - date: LocalDate
-  - clockIn: LocalTime
-  - clockOut: LocalTime
-}
+' ####################### RELATIONSHIPS #######################
+' Security Layer
+AuthServiceImpl .up.|> AuthService
+JpaUserRepository .up.|> UserRepository
+AuthServiceImpl --> UserRepository
+AuthServiceImpl --> JwtUtil
+SecurityConfig --> JwtAuthFilter
+SecurityConfig --> UserRepository
 
-'Agregation (Employee can exist without LeaveRequests)'
-Employee "1" --> "0..*" LeaveRequest : submits
-Employee "1" --> "0..*" Attendance : records
+' Leave Management
+LeaveServiceImpl .up.|> LeaveService
+JpaLeaveRepository .up.|> LeaveRepository
+LeaveServiceImpl --> LeaveRepository
+LeaveServiceImpl --> LeavePolicyValidator
+BasicLeavePolicyValidator .up.|> LeavePolicyValidator
+LeaveRequestDTO --> LeaveRequest : mapped to
 
-' ====================== Service Layer (Interface Implementation) ======================
-interface EmployeeService {
-  + createEmployee(employee: Employee): Employee
-  + getAllEmployees(): List<Employee>
-}
+' Attendance
+AttendanceServiceImpl .up.|> AttendanceService
+AttendanceServiceImpl --> AttendanceRepository
 
-interface LeaveService {
-  + submitRequest(request: LeaveRequest): LeaveRequest
-  + approveRequest(requestId: Long): LeaveRequest
-}
-
-class EmployeeServiceImpl {
-  - employeeRepository: EmployeeRepository
-  + createEmployee(employee: Employee): Employee
-  + getAllEmployees(): List<Employee>
-}
-
-class LeaveServiceImpl {
-  - leaveRepository: LeaveRepository
-  - policyValidator: LeavePolicyValidator
-  + submitRequest(request: LeaveRequest): LeaveRequest
-  + approveRequest(requestId: Long): LeaveRequest
-}
-
-EmployeeServiceImpl .up.|> EmployeeService : implements
-LeaveServiceImpl .up.|> LeaveService : implements
-
-' ====================== Repository Layer (Dependency Inversion) ======================
-interface EmployeeRepository {
-  + save(employee: Employee): Employee
-  + findAll(): List<Employee>
-}
-
-interface LeaveRepository {
-  + save(request: LeaveRequest): LeaveRequest
-  + findById(id: Long): LeaveRequest
-}
-
-class JpaEmployeeRepository {
-  + save(employee: Employee): Employee
-  + findAll(): List<Employee>
-}
-
-class JpaLeaveRepository {
-  + save(request: LeaveRequest): LeaveRequest
-  + findById(id: Long): LeaveRequest
-}
-
-JpaEmployeeRepository .up.|> EmployeeRepository : implements
-JpaLeaveRepository .up.|> LeaveRepository : implements
-
-EmployeeServiceImpl --> EmployeeRepository : depends on
-LeaveServiceImpl --> LeaveRepository : depends on
-LeaveServiceImpl --> LeavePolicyValidator : depends on
-
-' ====================== Policy Validation (Open/Closed Principle) ======================
-interface LeavePolicyValidator {
-  + validate(request: LeaveRequest): boolean
-}
-
-class BasicLeavePolicyValidator {
-  + validate(request: LeaveRequest): boolean
-}
-
-BasicLeavePolicyValidator .up.|> LeavePolicyValidator : implements
+' Associations
+User "1" --> "0..*" LeaveRequest : submits
+User "1" --> "0..*" Attendance : has
+DashboardService --> LeaveRepository : queries
 @enduml

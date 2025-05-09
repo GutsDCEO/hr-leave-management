@@ -1,0 +1,57 @@
+@startuml
+left to right direction
+
+actor Employee
+actor Manager
+actor Admin
+
+rectangle "HR System MVP" {
+  (Login) as UC0
+  (Register) as UC8
+  (Submit Leave Request) as UC1
+  (Approve/Reject Leave) as UC2
+  (View Employee Directory) as UC3
+  (Edit Employee Profile) as UC4
+  (Record Attendance) as UC5
+  (View Dashboard) as UC6
+  (Configure Policies) as UC7
+  (Assign User Roles) as UC9
+
+  ' Authentication
+  UC0 <.. UC1 : <<requires>>
+  UC0 <.. UC2 : <<requires>>
+  UC0 <.. UC3 : <<requires>>
+  UC0 <.. UC4 : <<requires>>
+  UC0 <.. UC5 : <<requires>>
+  UC0 <.. UC6 : <<requires>>
+  UC0 <.. UC7 : <<requires>>
+  UC0 <.. UC9 : <<requires>>
+
+  ' Actor connections
+  Employee --> UC0
+  Employee --> UC1
+  Employee --> UC5
+  Employee --> UC6
+
+  Manager --> UC0
+  Manager --> UC2
+  Manager --> UC3
+  Manager --> UC6
+
+  Admin --> UC0
+  Admin --> UC4
+  Admin --> UC7
+  Admin --> UC8
+  Admin --> UC9
+
+  ' Registration (admin-only in MVP)
+  UC8 <|-- Admin : <<extend>>
+
+  ' System boundary note
+  note right of UC0
+    **Security Constraints**
+    All use cases except Login/Register
+    require authentication
+  end note
+}
+@enduml

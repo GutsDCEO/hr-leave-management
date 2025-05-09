@@ -1,6 +1,7 @@
 package com.hrpfa.hr_pfa.security.jwt;
 
 
+import com.hrpfa.hr_pfa.user.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,18 +28,18 @@ public class JwtUtil {
     private long EXPIRATION_MS;
 
     //------------------------ Token Generation ------------------------//
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(User user) {
+        return generateToken(new HashMap<>(), user);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            User user
     ) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .claim("roles", userDetails.getAuthorities()) // Add roles to claims
+                .setSubject(user.getEmail())
+                .claim("roles", user.getRole()) // Add roles to claims
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
