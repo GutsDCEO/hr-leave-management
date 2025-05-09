@@ -8,14 +8,18 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
@@ -32,6 +36,14 @@ public class JwtUtil {
         return generateToken(new HashMap<>(), user);
     }
 
+    public List<GrantedAuthority> extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        List<String> roles = claims.get("roles", List.class);
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
+    }
+
     public String generateToken(
             Map<String, Object> extraClaims,
             User user
@@ -39,7 +51,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getEmail())
-                .claim("roles", user.getRole()) // Add roles to claims
+                .claim("roles", List.of(user.getRole())) // Add roles to claims
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -49,7 +61,7 @@ public class JwtUtil {
     //------------------------ Token Validation ------------------------//
     public boolean isTokenValid(String token) {
 
-        return extractExpiration(token).before(new Date());
+        return !isTokenExpired(token) && isSignatureValid(token);
     }
     public boolean isTokenValidForUser(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
@@ -100,6 +112,4 @@ public class JwtUtil {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
-
 }

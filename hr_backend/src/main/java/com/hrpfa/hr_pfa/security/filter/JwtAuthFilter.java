@@ -84,7 +84,6 @@ public class JwtAuthFilter extends OncePerRequestFilter{
     private boolean isPermittedEndpoint(HttpServletRequest request) {
         String path = request.getServletPath();
         return path.startsWith("/api/auth")
-                || path.startsWith("/h2-console/")
                 || path.startsWith("/api/user/hash-password");
     }
 }

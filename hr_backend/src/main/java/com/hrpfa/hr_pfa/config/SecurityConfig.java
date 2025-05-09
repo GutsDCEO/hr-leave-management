@@ -42,7 +42,6 @@ public class SecurityConfig {
                                 // Public endpoints (allow ALL HTTP methods)
                         .requestMatchers(
                                 "/api/auth/**",
-                                "/h2-console/**" ,
                                 "/api/user/hash-password")
                                 .permitAll()
                         // Role-based access (Open/Closed: Add new roles without modifying this)
