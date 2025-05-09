@@ -1,37 +1,59 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Employee Directory Management (Admin CRUD Operations)
 
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:Admin navigates to Employee Directory;
+:Admin selects action;
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
+partition "Create Employee" {
+  :Click "Add New Employee";
+  :Fill form (name, email, role, department);
+  -> Validation;
+  if (Email already exists?) then (Yes)
+    :Show "Email already registered" error;
+    stop
+  else if (Invalid role/department?) then (Yes)
+    :Show "Invalid input" error;
+    stop
+  else (No)
+    :Save employee to database;
+    :Show "Employee added successfully";
   endif
-else (false)
-endif
+}
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
+partition "Read Employees" {
+  :View employee list;
+  :Search/filter by name, role, department;
+  :Export list as PDF/CSV (optional);
+}
+
+partition "Update Employee" {
+  :Select employee from list;
+  :Edit details (role, department);
+  -> Validation;
+  if (No changes made?) then (Yes)
+    :Show "No changes detected" warning;
+    stop
+  else if (Invalid edits?) then (Yes)
+    :Show "Invalid input" error;
+    stop
+  else (No)
+    :Update employee in database;
+    :Show "Employee updated successfully";
   endif
-endif
+}
+
+partition "Delete Employee" {
+  :Select employee from list;
+  :Confirm deletion;
+  if (Confirmation?) then (Yes)
+    :Delete employee from database;
+    :Show "Employee deleted successfully";
+  else (No)
+    :Cancel deletion;
+    stop
+  endif
+}
 
 stop
-
 @enduml

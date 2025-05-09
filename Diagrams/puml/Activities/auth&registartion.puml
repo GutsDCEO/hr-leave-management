@@ -1,37 +1,51 @@
 @startuml
-'https://plantuml.com/activity-diagram-beta
+title Authentication & Registration Flow
 
 start
-:ClickServlet.handleRequest();
-:new page;
-if (Page.onSecurityCheck) then (true)
-  :Page.onInit();
-  if (isForward?) then (no)
-    :Process controls;
-    if (continue processing?) then (no)
-      stop
-    endif
+:User navigates to login page;
+:Enters email/password;
 
-    if (isPost?) then (yes)
-      :Page.onPost();
-    else (no)
-      :Page.onGet();
-    endif
-    :Page.onRender();
+-> Authentication;
+
+if (Valid credentials?) then (Yes)
+  :Generate JWT token;
+  :Decode token to get user role;
+
+  if (Role == EMPLOYEE?) then (Yes)
+    :Redirect to Employee Dashboard;
+  else if (Role == MANAGER?) then (Yes)
+    :Redirect to Manager Dashboard;
+  else if (Role == ADMIN?) then (Yes)
+    :Redirect to Admin Dashboard;
   endif
-else (false)
+
+else (No)
+  :Show "Invalid credentials" error;
+  stop
 endif
 
-if (do redirect?) then (yes)
-  :redirect process;
-else
-  if (do forward?) then (yes)
-    :Forward request;
-  else (no)
-    :Render page template;
+partition Admin Registration Flow {
+  :Admin navigates to User Management;
+  :Clicks "Register New User";
+  :Fills registration form:
+  - Email
+  - Password
+  - Role (Employee/Manager/Admin);
+
+  -> Validation;
+
+  if (Email exists?) then (Yes)
+    :Show "Email already registered" error;
+    stop
+  else if (Invalid role?) then (Yes)
+    :Show "Invalid role selection" error;
+    stop
+  else (No)
+    :Hash password (BCrypt);
+    :Save user to database;
+    :Show "Registration successful";
   endif
-endif
+}
 
 stop
-
 @enduml

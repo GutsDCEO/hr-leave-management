@@ -1,11 +1,58 @@
 @startuml
-'https://plantuml.com/sequence-diagram
+actor User
+participant "Angular UI" as UI
+participant "JwtAuthFilter" as Filter
+participant "Spring Security" as Security
+participant "LeaveController" as LeaveController
+participant "EmployeeController" as EmpController
 
 autonumber
 
-Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
+group Employee Access (Valid)
+  User -> UI: Access /api/leaves (ROLE_EMPLOYEE)
+  UI -> Filter: GET /api/leaves\nAuthorization: Bearer <JWT>
+  Filter -> Security: Validate token + extract roles
+  Security --> Filter: Role = EMPLOYEE
+  Filter -> LeaveController: Forward request
+  LeaveController -> Security: Check @PreAuthorize("hasRole('EMPLOYEE')")
+  Security --> LeaveController: Approved
+  LeaveController --> UI: 200 OK + data
+  UI --> User: Show leaves
+end
 
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response
+group Manager Access (Valid)
+  User -> UI: PATCH /api/leaves/123/approve (ROLE_MANAGER)
+  UI -> Filter: Send request
+  Filter -> Security: Validate token + roles
+  Security --> Filter: Role = MANAGER
+  Filter -> LeaveController: Forward
+  LeaveController -> Security: Check @PreAuthorize("hasRole('MANAGER')")
+  Security --> LeaveController: Approved
+  LeaveController --> UI: 200 OK
+  UI --> User: Show success
+end
+
+group Admin Access (Valid)
+  User -> UI: PUT /api/users/456 (ROLE_ADMIN)
+  UI -> Filter: Send request
+  Filter -> Security: Validate token + roles
+  Security --> Filter: Role = ADMIN
+  Filter -> EmpController: Forward
+  EmpController -> Security: Check @PreAuthorize("hasRole('ADMIN')")
+  Security --> EmpController: Approved
+  EmpController --> UI: 200 OK
+  UI --> User: Confirm update
+end
+
+group Unauthorized Access (Employee → Admin Endpoint)
+  User -> UI: DELETE /api/users/789 (ROLE_EMPLOYEE)
+  UI -> Filter: Send request
+  Filter -> Security: Validate token
+  Security --> Filter: Role = EMPLOYEE
+  Filter -> EmpController: Forward
+  EmpController -> Security: Check @PreAuthorize("hasRole('ADMIN')")
+  Security --> EmpController: Denied
+  EmpController --> UI: 403 Forbidden
+  UI --> User: Show error
+end
 @enduml

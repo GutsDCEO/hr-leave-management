@@ -1,0 +1,39 @@
+@startuml
+start
+:Employee navigates to login page;
+:Enters email and password;
+-> Authentication;
+if (Valid credentials?) then (Yes)
+  :Generate JWT token;
+  :Redirect to dashboard;
+else (No)
+  :Show "Invalid credentials" error;
+  stop
+endif
+
+:Employee clicks "Clock In";
+-> Authorization Check;
+if (User has role "EMPLOYEE"?) then (Yes)
+  :Check if already clocked in;
+  if (Not clocked in?) then (Yes)
+    :Record current time as clock-in;
+    :Save to Attendance table;
+    :Show "Clocked in" status;
+  else (No)
+    :Show "Already clocked in" error;
+  endif
+else (No)
+  :Show "Unauthorized" error;
+  stop
+endif
+
+if (Employee clicks "Clock Out"?) then (Yes)
+  :Record current time as clock-out;
+  :Calculate duration (clock-out - clock-in);
+  :Update Attendance record;
+  :Show "Clocked out" status;
+else (No)
+  :Remain on dashboard;
+endif
+stop
+@enduml

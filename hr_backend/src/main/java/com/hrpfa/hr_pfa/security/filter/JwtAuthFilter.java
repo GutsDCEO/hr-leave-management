@@ -21,6 +21,7 @@ public class JwtAuthFilter extends OncePerRequestFilter{
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
+    // Constructor-based injection
     public JwtAuthFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
@@ -32,6 +33,16 @@ public class JwtAuthFilter extends OncePerRequestFilter{
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
+
+        // Skip authentication for whitelisted URLs
+        String path = request.getServletPath();
+        String method = request.getMethod();
+        if (isPermittedEndpoint(request)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+
 
         // 1. Extract JWT token from the Authorization header
         final String authHeader = request.getHeader("Authorization");
@@ -68,5 +79,12 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 
         // 5. Continue the filter chain
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPermittedEndpoint(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.startsWith("/api/auth")
+                || path.startsWith("/h2-console/")
+                || path.startsWith("/api/user/hash-password");
     }
 }

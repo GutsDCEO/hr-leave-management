@@ -1,0 +1,25 @@
+@startuml
+actor Employee
+participant "Angular UI" as UI
+participant "LeaveController" as Controller
+participant "LeaveServiceImpl" as Service
+participant "LeaveRepository" as Repository
+participant "LeavePolicyValidator" as Validator
+
+Employee -> UI: Fills leave form
+UI -> Controller: POST /api/leave
+Controller -> Service: submitRequest(request)
+Service -> Validator: validate(request)
+Validator --> Service: true/false
+alt if valid
+  Service -> Repository: save(request)
+  Repository --> Service: savedRequest
+  Service --> Controller: savedRequest
+  Controller --> UI: 201 Created
+  UI --> Employee: Show success toast
+else if invalid
+  Service --> Controller: Error
+  Controller --> UI: 400 Bad Request
+  UI --> Employee: Show error
+end
+@enduml
