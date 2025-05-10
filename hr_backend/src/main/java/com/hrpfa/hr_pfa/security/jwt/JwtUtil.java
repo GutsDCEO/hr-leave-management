@@ -36,22 +36,23 @@ public class JwtUtil {
         return generateToken(new HashMap<>(), user);
     }
 
+
+    //------------------------ Role Extraction ------------------------//
     public List<GrantedAuthority> extractRoles(String token) {
         Claims claims = extractAllClaims(token);
-        List<String> roles = claims.get("roles", List.class);
-        return roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toList());
+        String role = claims.get("role", String.class); // Changed from "roles" to "role"
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role)); // Wrap the single role in a List
     }
+
 
     public String generateToken(
             Map<String, Object> extraClaims,
             User user
     ) {
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .setClaims(new HashMap<>())
                 .setSubject(user.getEmail())
-                .claim("roles", List.of(user.getRole())) // Add roles to claims
+                .claim("role", user.getRole()) // Ensure "role" is added as a claim
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_MS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -60,9 +61,17 @@ public class JwtUtil {
 
     //------------------------ Token Validation ------------------------//
     public boolean isTokenValid(String token) {
-
-        return !isTokenExpired(token) && isSignatureValid(token);
+        try {
+            extractAllClaims(token); // Validates signature
+            return !isTokenExpired(token);
+        } catch (Exception e) {
+            return false; // Invalid token (expired or bad signature)
+        }
     }
+
+
+
+
     public boolean isTokenValidForUser(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && isTokenValid(token);
