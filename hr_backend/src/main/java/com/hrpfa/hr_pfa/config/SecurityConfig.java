@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 // Public endpoints (allow ALL HTTP methods)
                         .requestMatchers(
+                                "/auth/login/**",
                                 "/api/auth/**",
                                 "/api/user/hash-password")
                                 .permitAll()

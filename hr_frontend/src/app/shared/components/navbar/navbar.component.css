@@ -1,0 +1,19 @@
+nav {
+  background: #f8f9fa;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid #ddd;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+button {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+}

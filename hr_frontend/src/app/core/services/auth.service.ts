@@ -1,0 +1,76 @@
+// src/app/core/services/auth.service.ts
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { User } from '../models/user.model'; // Adjust the path as necessary
+import { environment } from '../../../environments/environment'; // Adjust the path as necessary
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private apiUrl = environment.apiUrl;
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+
+  constructor(private http: HttpClient) {
+    this.initializeAuthState();
+  }
+
+  // Initialize auth state by decoding the stored token
+  private initializeAuthState(): void {
+    const token = localStorage.getItem('jwt_token');
+
+    if (token) {
+      const user = this.decodeToken(token);
+      this.currentUserSubject.next(user);
+    }
+  }
+
+  login(email: string, password: string): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.apiUrl}/api/auth/login`, { email, password })
+      .pipe(
+        tap(response => {
+          localStorage.setItem('jwt_token', response.token);
+          const user = this.decodeToken(response.token);
+          this.currentUserSubject.next(user);
+        })
+      );
+  }
+
+  // Decode token to get User (email + role)
+  private decodeToken(token: string): User | null {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Extract role as a string (no longer an array)
+      return {
+        email: payload.sub,
+        role: payload.role // "ADMIN", "EMPLOYEE", etc.
+      };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  getCurrentUser(): Observable<User | null> {
+    return this.currentUserSubject.asObservable();
+  }
+
+  logout(): void {
+    localStorage.removeItem('jwt_token');
+    this.currentUserSubject.next(null);
+  }
+
+  // Get the User object (includes role)
+  get currentUser$(): Observable<User | null> {
+    return this.currentUserSubject.asObservable();
+  }
+
+  // Derive role from the User object
+  get currentRole(): string | null {
+    return this.currentUserSubject.value?.role || null;
+  }
+
+  get isLoggedIn(): boolean {
+    return !!this.currentUserSubject.value;
+  }
+}

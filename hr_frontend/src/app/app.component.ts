@@ -1,25 +1,12 @@
 import { Component } from '@angular/core';
+import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { RouterOutlet } from '@angular/router';
-import { LoginComponent } from "./login/login.component";
-import { SignupComponent } from './signup/signup.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, LoginComponent, SignupComponent],
+  standalone: true,
+  imports: [NavbarComponent, RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'Code Step by Step';
-  name = 'Human Resource Management System';
-  handleClickEvent() {
-    alert("Button Clicked!");
-    this.otherFunction();
-  }
-
-  otherFunction() {
-    // Other function logic here
-    console.log("Other function executed");
-  }
-
-}
+export class AppComponent {}
