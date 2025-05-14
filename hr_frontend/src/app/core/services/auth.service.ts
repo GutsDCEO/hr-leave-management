@@ -4,15 +4,18 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { User } from '../models/user.model'; // Adjust the path as necessary
 import { environment } from '../../../environments/environment'; // Adjust the path as necessary
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class AuthService {
   private apiUrl = environment.apiUrl;
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  window: any;
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     this.initializeAuthState();
   }
 
@@ -33,6 +36,11 @@ export class AuthService {
           localStorage.setItem('jwt_token', response.token);
           const user = this.decodeToken(response.token);
           this.currentUserSubject.next(user);
+        })
+      ).pipe(
+        tap(() => {
+          // After successful login, navigate to the home page (or dashboard)
+          this.router.navigate(['/']);
         })
       );
   }
@@ -55,9 +63,14 @@ export class AuthService {
     return this.currentUserSubject.asObservable();
   }
 
+  
+
   logout(): void {
-    localStorage.removeItem('jwt_token');
+    localStorage.removeItem('jwt_token')
+
     this.currentUserSubject.next(null);
+    window.location.replace('/login');
+    
   }
 
   // Get the User object (includes role)

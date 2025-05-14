@@ -6,19 +6,20 @@ import { AuthGuard } from './core/guards/auth.guards';
 import { RoleGuard } from './core/guards/role.guards';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuard] },
   {
-    path: 'admin/dashboard',
+    path: 'admin',
     loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ADMIN' }
   },
   {
-    path: 'employee/dashboard',
+    path: 'employee',
     loadChildren: () => import('./modules/employee/employee.module').then(m => m.EmployeeModule),
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'EMPLOYEE' }
   },
+  
   { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
 

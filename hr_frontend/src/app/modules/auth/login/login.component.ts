@@ -52,14 +52,12 @@ export class LoginComponent {
   private redirectBasedOnRole(role: string): void {
     switch (role) {
       case 'ADMIN':
-        this.router.navigate(['/admin/dashboard']);
+        this.router.navigate(['admin']);
         break;
       case 'EMPLOYEE':
-        this.router.navigate(['/employee/dashboard']);
+        this.router.navigate(['/employee']);
         break;
-      case 'MANAGER':
-        this.router.navigate(['/manager/dashboard']);
-        break;
+
       default:
         this.toast.showError('Unauthorized role');
         this.router.navigate(['/unauthorized']);

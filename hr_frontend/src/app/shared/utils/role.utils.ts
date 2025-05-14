@@ -18,13 +18,7 @@ export function getPermissionsForRole(role: string | null): RolePermissions {
                 canApproveLeaves: true,
                 canClockInOut: false
             };
-        case 'MANAGER':
-            return {
-                canViewDashboard: true,
-                canManageUsers: false,
-                canApproveLeaves: true,
-                canClockInOut: false
-            };
+
         case 'EMPLOYEE':
             return {
                 canViewDashboard: true,

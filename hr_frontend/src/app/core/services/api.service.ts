@@ -14,7 +14,7 @@ export class ApiService {
 
   private getHeaders(customHeaders?: { [header: string]: string }): HttpHeaders {
     let headers = new HttpHeaders({ 'Content-Type': 'application/json', ...customHeaders });
-    // JWT token is typically added by an HTTP interceptor (JwtInterceptor), so not added here directly
+    // JWT token is typically added by an HTTP interceptor (JwtInterceptor)
     return headers;
   }
 

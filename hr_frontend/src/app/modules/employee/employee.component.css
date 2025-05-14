@@ -1,0 +1,42 @@
+.employee {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.employee h1 {
+  color: #43a047;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+.employee section {
+  margin-bottom: 2rem;
+}
+.employee.actions button {
+  margin-right: 1rem;
+  margin-bottom: 0.5rem;
+}
+.employee.leave-status ul {
+  list-style: none;
+  padding: 0;
+}
+.employee.leave-status li {
+  background: #f5f5f5;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+}
+.employee.leave-status .Approved {
+  color: #388e3c;
+  font-weight: bold;
+}
+.employee.leave-status .Pending {
+  color: #ffa000;
+  font-weight: bold;
+}
+.employee.leave-status .Rejected {
+  color: #d32f2f;
+  font-weight: bold;
+}

@@ -1,0 +1,23 @@
+<div class="employee">
+  <h1>Employee Home</h1>
+  <section class="overview">
+    <h2>Overview</h2>
+    <p>Welcome! Here you can view your leave balance, submit leave requests, and track request status.</p>
+  </section>
+
+  <section class="actions">
+    <h2>Quick Actions</h2>
+    <button class="btn btn-primary">Submit Leave Request</button>
+    <button class="btn btn-secondary">View Leave Balance</button>
+    <button class="btn btn-info">Track Requests</button>
+  </section>
+
+  <section class="leave-status">
+    <h2>Recent Leave Requests</h2>
+    <ul>
+      <li *ngFor="let request of leaveRequests">
+        {{ request.date }} - {{ request.type }} - <span>{{ request.status }}</span>
+      </li>
+    </ul>
+  </section>
+</div>

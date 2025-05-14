@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-admin',
-    template: '<h1>Admin Dashboard</h1>',
-    styles: ['h1 { color: blue; }']
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './admin.component.html',
+    styleUrls: ['./admin.component.css']
 })
 export class AdminComponent { }
