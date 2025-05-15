@@ -10,14 +10,14 @@
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" *ngIf="!authService.isLoggedIn" (click)="navigateToLogin()" >Login</a>
+            <a class="nav-link" *ngIf="!authService.isLoggedIn" (click)="navigateToLogin()" href="#" >Login</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" *ngIf="authService.isLoggedIn" (click)="authService.logout()">Logout</a>
+            <a class="nav-link" *ngIf="authService.isLoggedIn" (click)="authService.logout()" href="#">Logout</a>
           </li>
           
           <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true" *ngIf="!authService.isLoggedIn" >Sign in</a>
+            <a class="nav-link disabled" aria-disabled="true" *ngIf="!authService.isLoggedIn" href="#">Sign in</a>
           </li>
         </ul>
       </div>

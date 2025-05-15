@@ -10,7 +10,7 @@ import { AuthService } from "../../../core/services/auth.service";
     imports: [CommonModule, RouterModule],
     templateUrl: './sidebar.component.html',
     styleUrls: ['./sidebar.component.css'],
-    /* schemas: [CUSTOM_ELEMENTS_SCHEMA] */
+
 })
 export class SidebarComponent implements OnInit {
     currentRole: string | null = null;
