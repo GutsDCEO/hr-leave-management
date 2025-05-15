@@ -29,6 +29,10 @@ export class AuthService {
     }
   }
 
+  register(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/api/auth/register`, payload);
+  }
+
   login(email: string, password: string): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(`${this.apiUrl}/api/auth/login`, { email, password })
       .pipe(

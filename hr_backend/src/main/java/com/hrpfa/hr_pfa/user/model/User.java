@@ -1,10 +1,7 @@
 package com.hrpfa.hr_pfa.user.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -12,6 +9,7 @@ import java.io.Serializable;
 @Table(name = "users")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements Serializable {

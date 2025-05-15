@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 // Public endpoints (allow ALL HTTP methods)
                         .requestMatchers(
                                 "/auth/login/**",
+                                "/api/auth/register", // Added registration endpoint
                                 "/api/auth/**",
                                 "/api/user/hash-password")
                                 .permitAll()

@@ -1,8 +1,11 @@
 package com.hrpfa.hr_pfa.user.controller;
 
+import com.hrpfa.hr_pfa.exceptions.UserAlreadyExistsException;
 import com.hrpfa.hr_pfa.security.models.AuthRequest;
 import com.hrpfa.hr_pfa.security.models.AuthResponse;
 import com.hrpfa.hr_pfa.security.service.AuthService;
+import com.hrpfa.hr_pfa.user.dto.RegisterResponseDTO;
+import com.hrpfa.hr_pfa.user.dto.RegisterUserDTO;
 import com.hrpfa.hr_pfa.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,20 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException ex) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+        }
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
+        try {
+            RegisterResponseDTO response = authService.register(registerUserDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (UserAlreadyExistsException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Registration failed: " + ex.getMessage());
         }
     }
 }

@@ -29,12 +29,17 @@ export class LoginComponent {
     });
   }
 
+  goToRegister(): void {
+    this.router.navigate(['/register']);
+  }
+
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
     const { email, password } = this.loginForm.value;
     this.authService.login(email, password).subscribe({
       next: () => {
+        // Get role from AuthService
         // ✅ Get role from AuthService
         const role = this.authService.currentRole;
         if (role) {
