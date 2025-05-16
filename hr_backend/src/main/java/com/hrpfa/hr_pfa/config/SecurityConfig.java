@@ -49,7 +49,7 @@ public class SecurityConfig {
                         // Role-based access (Open/Closed: Add new roles without modifying this)
                                 .requestMatchers("/api/user/**").hasRole("ADMIN") // Ensure roles match
 //                        Spring Security applies rules top-to-bottom. Place broader rules (e.g., anyRequest().authenticated()) last
-                        .requestMatchers("/api/leaves/**").hasAnyRole("EMPLOYEE", "MANAGER")
+                        .requestMatchers("/api/leaves/**").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 // All other requests require authentication
                         .anyRequest().authenticated()
