@@ -4,9 +4,10 @@ import { RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './modules/auth/login/login.component';
 import { AuthGuard } from './core/guards/auth.guards';
 import { RoleGuard } from './core/guards/role.guards';
+import { NoAuthGuard } from './core/guards/no_auth.guards';
 
 const routes: Routes = [
-  { path: 'login', component: LoginComponent, canActivate: [AuthGuard] },
+  { path: 'login', component: LoginComponent, canActivateChild: [NoAuthGuard] },
   {
     path: 'admin',
     loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
