@@ -1,0 +1,279 @@
+<p>leave-requests-management works!</p>
+<!-- leave-requests-management.component.html -->
+<div class="leave-requests-container">
+    <!-- Filter/Search Section -->
+    <div class="filter-bar">
+      <input type="text" class="search-input" placeholder="Search by name, department, or reason...">
+      <select class="status-filter">
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+      <select class="status-filter">
+        <option value="">All Leave Types</option>
+        <option value="vacation">Vacation</option>
+        <option value="sick">Sick Leave</option>
+        <option value="personal">Personal</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+  
+    <!-- Table Section -->
+    <div class="requests-table-container">
+      <table class="requests-table">
+        <thead>
+          <tr>
+            <th>Employee</th>
+            <th>Leave Type</th>
+            <th>From</th>
+            <th>To</th>
+            <th>Duration</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Sample Row 1 -->
+          <tr>
+            <td>
+              <div class="employee-info">
+                <img src="assets/avatars/user1.jpg" alt="Employee" class="employee-avatar">
+                <div class="employee-details">
+                  <span class="employee-name">John Smith</span>
+                  <span class="employee-position">Software Developer</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="leave-type leave-vacation">Vacation</span>
+            </td>
+            <td class="date-display">May 20, 2025</td>
+            <td class="date-display">May 27, 2025</td>
+            <td>8 days</td>
+            <td>
+              <div class="reason-text" title="Annual family vacation to Europe for summer holidays">
+                Annual family vacation to Europe for summer holidays
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-pending">Pending</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-approve">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-reject">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+  
+          <!-- Sample Row 2 -->
+          <tr>
+            <td>
+              <div class="employee-info">
+                <img src="assets/avatars/user2.jpg" alt="Employee" class="employee-avatar">
+                <div class="employee-details">
+                  <span class="employee-name">Sarah Johnson</span>
+                  <span class="employee-position">Marketing Specialist</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="leave-type leave-sick">Sick Leave</span>
+            </td>
+            <td class="date-display">May 15, 2025</td>
+            <td class="date-display">May 16, 2025</td>
+            <td>2 days</td>
+            <td>
+              <div class="reason-text" title="Doctor appointment and recovery">
+                Doctor appointment and recovery
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-approved">Approved</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-approve btn-disabled" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-reject btn-disabled" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+  
+          <!-- Sample Row 3 -->
+          <tr>
+            <td>
+              <div class="employee-info">
+                <img src="assets/avatars/user3.jpg" alt="Employee" class="employee-avatar">
+                <div class="employee-details">
+                  <span class="employee-name">Michael Chen</span>
+                  <span class="employee-position">Financial Analyst</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="leave-type leave-personal">Personal</span>
+            </td>
+            <td class="date-display">May 22, 2025</td>
+            <td class="date-display">May 22, 2025</td>
+            <td>1 day</td>
+            <td>
+              <div class="reason-text" title="Family event">
+                Family event
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-rejected">Rejected</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-approve btn-disabled" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-reject btn-disabled" disabled>
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+  
+          <!-- Sample Row 4 -->
+          <tr>
+            <td>
+              <div class="employee-info">
+                <img src="assets/avatars/user4.jpg" alt="Employee" class="employee-avatar">
+                <div class="employee-details">
+                  <span class="employee-name">Emily Davis</span>
+                  <span class="employee-position">HR Specialist</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="leave-type leave-other">Other</span>
+            </td>
+            <td class="date-display">June 5, 2025</td>
+            <td class="date-display">June 6, 2025</td>
+            <td>2 days</td>
+            <td>
+              <div class="reason-text" title="Professional development workshop">
+                Professional development workshop
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-pending">Pending</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-approve">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-reject">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+  
+          <!-- Sample Row 5 -->
+          <tr>
+            <td>
+              <div class="employee-info">
+                <img src="assets/avatars/user5.jpg" alt="Employee" class="employee-avatar">
+                <div class="employee-details">
+                  <span class="employee-name">Robert Wilson</span>
+                  <span class="employee-position">Project Manager</span>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="leave-type leave-vacation">Vacation</span>
+            </td>
+            <td class="date-display">May 28, 2025</td>
+            <td class="date-display">June 4, 2025</td>
+            <td>8 days</td>
+            <td>
+              <div class="reason-text" title="Summer vacation with family">
+                Summer vacation with family
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-pending">Pending</span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="btn btn-approve">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Approve
+                </button>
+                <button class="btn btn-reject">
+                  <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                  Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <!-- Pagination -->
+      <div class="pagination">
+        <div class="pagination-info">
+          Showing 1-5 of 25 entries
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-button">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+          </button>
+          <button class="pagination-button pagination-button-active">1</button>
+          <button class="pagination-button">2</button>
+          <button class="pagination-button">3</button>
+          <button class="pagination-button">4</button>
+          <button class="pagination-button">5</button>
+          <button class="pagination-button">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 18l6-6-6-6"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
