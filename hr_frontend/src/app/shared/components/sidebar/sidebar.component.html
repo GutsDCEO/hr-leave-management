@@ -3,19 +3,19 @@
   <div id="sidebar">
     <ul class="table">
       <p>DEBUG : {{currentRole}}</p>
-      <li *ngIf="currentRole === 'admin'">
+      <li *ngIf="currentRole === 'ADMIN'">
         <a href="#">
           <i class="zmdi zmdi-view-dashboard"></i> Dashboard
         </a>
       </li>
-      <li *ngIf="currentRole === 'employee'">
+      <li *ngIf="currentRole === 'EMPLOYEE'">
         <a href="#">
           <i class="zmdi zmdi-link"></i> Leave Request
         </a>
       </li>
       <li>
-        <a href="#">
-          <i class="zmdi zmdi-widgets"></i> Overview
+        <a [routerLink]="['/admin/leave-requests']">
+          <i class="zmdi zmdi-widgets"></i> Services
         </a>
       </li>
       <li>
