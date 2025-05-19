@@ -13,15 +13,17 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.util.List;
 
+//@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/api/leaves")
-@PreAuthorize("hasRole('ADMIN')")
 public class LeaveController {
 
     @Autowired
     private LeaveService leaveService;
 
+    // Allow both roles to view
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Page<LeaveResponseDTO> listLeaves(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
