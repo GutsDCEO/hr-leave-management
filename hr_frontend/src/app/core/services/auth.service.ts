@@ -88,6 +88,18 @@ export class AuthService {
   }
 
   get isLoggedIn(): boolean {
-    return !!this.currentUserSubject.value;
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return false;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Check if token is expired
+      const expirationDate = new Date(payload.exp * 1000);
+      return expirationDate > new Date();
+    } catch (e) {
+      console.error('Error validating token:', e);
+      this.logout();
+      return false;
+    }
   }
 }

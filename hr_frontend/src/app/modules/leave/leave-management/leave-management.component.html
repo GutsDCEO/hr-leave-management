@@ -1,0 +1,22 @@
+<div class="leave-management-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Leave Management</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <mat-tab-group [selectedIndex]="activeTab === 'list' ? 0 : 1" (selectedTabChange)="onTabChange($event)">
+        <mat-tab label="My Leave Requests">
+          <div class="tab-content">
+            <router-outlet></router-outlet>
+          </div>
+        </mat-tab>
+        <mat-tab label="Request Leave">
+          <div class="tab-content">
+            <router-outlet></router-outlet>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

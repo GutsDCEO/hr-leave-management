@@ -44,13 +44,20 @@ public class SecurityConfig {
                                 "/auth/login/**",
                                 "/api/auth/register", // Added registration endpoint
                                 "/api/auth/**",
-                                "/api/user/hash-password")
+                                "/api/user/hash-password",
+                                "/api/test/**"  // Allow test endpoints
+                                )
                                 .permitAll()
                         // Role-based access (Open/Closed: Add new roles without modifying this)
                                 .requestMatchers("/api/user/**").hasRole("ADMIN") // Ensure roles match
-//                        Spring Security applies rules top-to-bottom. Place broader rules (e.g., anyRequest().authenticated()) last
-                        .requestMatchers("/api/leaves/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                // Allow employees to access their own leave endpoints
+                                .requestMatchers(HttpMethod.GET, "/api/employee/leaves/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/employee/leaves").hasAnyRole("EMPLOYEE", "ADMIN")
+                                .requestMatchers(HttpMethod.PUT, "/api/employee/leaves/**").hasAnyRole("EMPLOYEE", "ADMIN")
+                                .requestMatchers(HttpMethod.PATCH, "/api/employee/leaves/**/cancel").hasAnyRole("EMPLOYEE", "ADMIN")
+                                // Admin-only endpoints
+                                .requestMatchers("/api/leaves/**").hasRole("ADMIN")
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 // All other requests require authentication
                         .anyRequest().authenticated()
                 )

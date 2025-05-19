@@ -1,0 +1,152 @@
+.leave-list-container {
+  padding: 1rem;
+}
+
+.filters-container {
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  
+  &-success {
+    background-color: #d1e7dd;
+    color: #0f5132;
+  }
+  
+  &-warning {
+    background-color: #fff3cd;
+    color: #664d03;
+  }
+  
+  &-danger {
+    background-color: #f8d7da;
+    color: #842029;
+  }
+  
+  &-secondary {
+    background-color: #e2e3e5;
+    color: #41464b;
+  }
+  
+  &-light {
+    background-color: #f8f9fa;
+    color: #636464;
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mat-mdc-table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 1rem;
+  border-collapse: collapse;
+  
+  th.mat-header-cell {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.87);
+  }
+  
+  td.mat-cell, th.mat-header-cell {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+  
+  tr.mat-row:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.mat-mdc-paginator {
+  background: transparent;
+  margin-top: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-end {
+  text-align: right;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+
+.me-2 {
+  margin-right: 0.5rem !important;
+}
+
+.py-4 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.px-3 {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.w-100 {
+  width: 100% !important;
+}
+
+.d-flex {
+  display: flex !important;
+}
+
+.flex-column {
+  flex-direction: column !important;
+}
+
+.align-items-center {
+  align-items: center !important;
+}
+
+.justify-content-between {
+  justify-content: space-between !important;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .filters-container {
+    .row > div {
+      margin-bottom: 1rem;
+    }
+  }
+  
+  .mat-mdc-table {
+    td.mat-cell, th.mat-header-cell {
+      padding: 0.5rem;
+    }
+  }
+}

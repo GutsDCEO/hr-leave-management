@@ -1,0 +1,160 @@
+<div class="leave-list-container">
+  <div class="filters-container mb-4">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Filter Leave Requests</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="row g-3">
+          <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="statusFilter" name="status">
+                <mat-option value="">All Statuses</mat-option>
+                <mat-option *ngFor="let status of ['PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']" 
+                           [value]="status">
+                  {{ status | titlecase }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Leave Type</mat-label>
+              <mat-select [(ngModel)]="typeFilter" name="type">
+                <mat-option value="">All Types</mat-option>
+                <mat-option *ngFor="let type of ['ANNUAL', 'SICK', 'MATERNITY', 'PATERNITY', 'UNPAID', 'STUDY', 'COMPASSIONATE', 'OTHER']" 
+                           [value]="type">
+                  {{ type | titlecase }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Start Date</mat-label>
+              <input matInput [matDatepicker]="startDatePicker" [(ngModel)]="startDateFilter" name="startDate">
+              <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #startDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-md-3">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>End Date</mat-label>
+              <input matInput [matDatepicker]="endDatePicker" [(ngModel)]="endDateFilter" name="endDate">
+              <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+              <mat-datepicker #endDatePicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+          
+          <div class="col-12 text-end">
+            <button type="button" mat-stroked-button color="warn" class="me-2" (click)="clearFilters()" [disabled]="!statusFilter && !typeFilter && !startDateFilter && !endDateFilter">
+              <mat-icon>clear</mat-icon> Clear
+            </button>
+            <button type="submit" mat-flat-button color="primary">
+              <mat-icon>search</mat-icon> Apply Filters
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <mat-card>
+    <mat-card-header class="d-flex justify-content-between align-items-center">
+      <mat-card-title>My Leave Requests</mat-card-title>
+      <button mat-flat-button color="primary" routerLink="/leaves/request">
+        <mat-icon>add</mat-icon> New Request
+      </button>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="table-responsive">
+        <table mat-table [dataSource]="dataSource" matSort class="w-100">
+          <!-- Start Date Column -->
+          <ng-container matColumnDef="startDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.startDate | date: 'mediumDate' }}
+            </td>
+          </ng-container>
+
+          <!-- End Date Column -->
+          <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>End Date</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.endDate | date: 'mediumDate' }}
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+            <td mat-cell *matCellDef="let element">
+              {{ getLeaveTypeDisplay(element.type) }}
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+            <td mat-cell *matCellDef="let element">
+              <span class="badge" [ngClass]="getStatusBadgeClass(element.status)">
+                {{ element.status | titlecase }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef class="text-end">Actions</th>
+            <td mat-cell *matCellDef="let element" class="text-end">
+              <button mat-icon-button color="primary" (click)="viewLeaveRequest(element.id)" matTooltip="View Details">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" 
+                      *ngIf="element.status === 'PENDING' || element.status === 'APPROVED'"
+                      (click)="cancelLeaveRequest(element.id)" 
+                      matTooltip="Cancel Request">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          
+          <!-- Empty state -->
+          <tr class="mat-row" *matNoDataRow>
+            <td class="mat-cell text-center py-4" [attr.colspan]="displayedColumns.length">
+              <div class="d-flex flex-column align-items-center">
+                <mat-icon class="text-muted mb-2">event_busy</mat-icon>
+                <p class="text-muted mb-0">No leave requests found</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Loading indicator -->
+      <div class="text-center py-4" *ngIf="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="mt-2 mb-0">Loading leave requests...</p>
+      </div>
+
+      <!-- Pagination -->
+      <mat-paginator [length]="totalItems"
+                    [pageSize]="pageSize"
+                    [pageIndex]="pageIndex"
+                    [pageSizeOptions]="[5, 10, 25, 100]"
+                    (page)="onPageChange($event)"
+                    showFirstLastButtons
+                    aria-label="Select page of leave requests"
+                    *ngIf="totalItems > 0">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>

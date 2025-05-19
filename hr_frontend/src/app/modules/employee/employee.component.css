@@ -1,42 +1,353 @@
-.employee {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+/* Main container */
+.employee-dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: calc(100vh - 64px);
 }
-.employee h1 {
-  color: #43a047;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+
+/* Header */
+.employee-dashboard h1 {
+  color: #1a365d;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
 }
-.employee section {
+
+.employee-dashboard p {
+  color: #4a5568;
+  margin: 0;
+}
+
+/* Leave balance cards */
+.leave-balance-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 100%;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+}
+
+.leave-balance-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.leave-balance-card mat-card-header {
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.leave-balance-card mat-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.25rem;
+}
+
+.leave-balance-card mat-card-subtitle {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.leave-balance-card mat-card-content {
+  padding: 0 1.25rem 1.25rem;
+}
+
+/* Progress bar */
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background-color: #e2e8f0;
+  margin: 0.75rem 0;
+  overflow: hidden;
+}
+
+.progress-bar .progress {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #4299e1 0%, #3182ce 100%);
+  transition: width 0.6s ease;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-cancelled {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+/* Table styles */
+mat-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
   margin-bottom: 2rem;
 }
-.employee.actions button {
-  margin-right: 1rem;
+
+mat-card-header {
+  padding: 1.25rem 1.5rem 0;
+  border-bottom: 1px solid #edf2f7;
+  margin-bottom: 1rem;
+}
+
+mat-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+mat-card-content {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.mat-mdc-table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mat-mdc-header-row {
+  background-color: #f8fafc;
+  height: 48px;
+}
+
+.mat-mdc-header-cell {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mat-mdc-row {
+  transition: background-color 0.2s;
+  height: 56px;
+}
+
+.mat-mdc-row:hover {
+  background-color: #f8fafc;
+}
+
+.mat-mdc-cell {
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+/* Action buttons */
+.action-menu {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #718096;
+}
+
+.empty-state mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  color: #cbd5e0;
+}
+
+.empty-state p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .employee-dashboard {
+    padding: 1rem;
+  }
+  
+  .mat-mdc-cell, 
+  .mat-mdc-header-cell {
+    padding: 0 8px !important;
+  }
+  
+  .action-menu {
+    justify-content: center;
+  }
+}
+
+/* Button styles */
+button[mat-raised-button] {
+  border-radius: 8px;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0 20px;
+  height: 42px;
+  font-size: 0.875rem;
+}
+
+button[mat-stroked-button] {
+  border-radius: 8px;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0 20px;
+  height: 42px;
+  font-size: 0.875rem;
+  border: 1px solid #e2e8f0;
+}
+
+button[mat-button] {
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  font-size: 0.875rem;
+}
+
+/* Utility classes */
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.py-8 {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-gray-600 {
+  color: #718096;
+}
+
+.text-gray-800 {
+  color: #2d3748;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.px-2 {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.py-1 {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-4xl {
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+
+.mb-2 {
   margin-bottom: 0.5rem;
 }
-.employee.leave-status ul {
-  list-style: none;
-  padding: 0;
-}
-.employee.leave-status li {
-  background: #f5f5f5;
-  margin-bottom: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-}
-.employee.leave-status .Approved {
-  color: #388e3c;
-  font-weight: bold;
-}
-.employee.leave-status .Pending {
-  color: #ffa000;
-  font-weight: bold;
-}
-.employee.leave-status .Rejected {
-  color: #d32f2f;
-  font-weight: bold;
+
+.text-right {
+  text-align: right;
 }

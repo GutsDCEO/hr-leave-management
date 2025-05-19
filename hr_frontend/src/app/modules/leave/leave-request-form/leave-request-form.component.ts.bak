@@ -1,0 +1,753 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, FormControl } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import * as moment from 'moment';
+
+// Models and Services
+import { LeaveType, LeaveRequest, LeaveStatus, LeaveBalance } from '../models/leave.model';
+import { LeaveService } from '../shared/leave.service';
+import { ConfirmDialogComponent } from '@shared/components';
+
+// Date format configuration
+export const MY_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
+
+interface LeaveRequestFormGroup {
+  leaveType: FormControl<LeaveType | null>;
+  startDate: FormControl<Date | null>;
+  endDate: FormControl<Date | null>;
+  reason: FormControl<string | null>;
+  attachment: FormControl<File | null>;
+}
+
+interface LeaveBalanceExtended extends LeaveBalance {
+  leaveType: LeaveType;
+  remainingDays: number;
+  pendingDays: number;
+  totalDays: number;
+  usedDays: number;
+  fiscalYear: number;
+}
+
+@Component({
+  selector: 'app-leave-request-form',
+  templateUrl: './leave-request-form.component.html',
+  styleUrls: ['./leave-request-form.component.scss'],
+  providers: [
+    { 
+      provide: DateAdapter, 
+      useClass: MomentDateAdapter, 
+      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS] 
+    },
+    { 
+      provide: MAT_DATE_FORMATS, 
+      useValue: MY_FORMATS 
+    }
+  ]
+})
+export class LeaveRequestFormComponent implements OnInit {
+  leaveForm: FormGroup<LeaveRequestFormGroup>;
+  loading = false;
+  submitting = false;
+  leaveTypes = Object.values(LeaveType);
+  today = new Date();
+  minStartDate = new Date();
+  minEndDate = new Date();
+  leaveBalances: LeaveBalanceExtended[] = [];
+  selectedFiles: File[] = [];
+  maxFileSize = 5 * 1024 * 1024; // 5MB
+  allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+  durationInDays = 0;
+  
+  dateErrors = {
+    required: 'This field is required',
+    invalidDate: 'Please enter a valid date',
+    startDateAfterEnd: 'Start date must be before end date',
+    endDateBeforeStart: 'End date must be after start date',
+    weekendNotAllowed: 'Weekends are not allowed',
+    insufficientNotice: 'Must submit at least 1 day in advance'
+  };
+
+  constructor(
+    private fb: FormBuilder,
+    private leaveService: LeaveService,
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private dialog: MatDialog,
+    private dateAdapter: DateAdapter<Date>
+  ) {
+    // Set the locale for the date adapter
+    this.dateAdapter.setLocale('en-GB'); // Use UK format (DD/MM/YYYY)
+    this.leaveForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.loadLeaveBalances();
+    this.setupFormListeners();
+  }
+
+  private createForm(): FormGroup<LeaveRequestFormGroup> {
+    return this.fb.group<LeaveRequestFormGroup>({
+      leaveType: new FormControl<LeaveType | null>(null, [Validators.required]),
+      startDate: new FormControl<Date | null>(null, [
+        Validators.required,
+        this.validateDate.bind(this, 'startDate')
+      ]),
+      endDate: new FormControl<Date | null>(null, [
+        Validators.required,
+        this.validateDate.bind(this, 'endDate')
+      ]),
+      reason: new FormControl<string | null>('', [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500)
+      ]),
+      attachment: new FormControl<File | null>(null, [
+        this.validateFileType.bind(this),
+        this.validateFileSize.bind(this)
+      ])
+    });
+  }
+
+  private loadLeaveBalances(): void {
+    this.loading = true;
+    this.leaveService.getMyLeaveBalance().subscribe({
+      next: (balance: LeaveBalance) => {
+        this.leaveBalances = [{
+          ...balance,
+          leaveType: balance.leaveType,
+          remainingDays: balance.totalDays - balance.usedDays,
+          pendingDays: balance.pendingDays || 0,
+          totalDays: balance.totalDays,
+          usedDays: balance.usedDays,
+          fiscalYear: balance.fiscalYear || new Date().getFullYear()
+        }];
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading leave balances:', error);
+        this.snackBar.open('Failed to load leave balances', 'Close', { duration: 3000 });
+        this.loading = false;
+      }
+    });
+  }
+
+  private setupFormListeners(): void {
+    // Update minEndDate when startDate changes
+    this.leaveForm.get('startDate')?.valueChanges.subscribe(startDate => {
+      if (startDate) {
+        this.minEndDate = new Date(startDate);
+        this.leaveForm.get('endDate')?.updateValueAndValidity();
+      }
+    });
+
+    // Calculate duration when dates change
+    this.leaveForm.get('startDate')?.valueChanges.subscribe(() => this.calculateDuration());
+    this.leaveForm.get('endDate')?.valueChanges.subscribe(() => this.calculateDuration());
+  }
+
+  private calculateDuration(): void {
+    const startDate = this.leaveForm.get('startDate')?.value;
+    const endDate = this.leaveForm.get('endDate')?.value;
+
+    if (startDate && endDate) {
+      const startMoment = moment(startDate);
+      const endMoment = moment(endDate);
+      
+      if (startMoment.isValid() && endMoment.isValid()) {
+        this.durationInDays = endMoment.diff(startMoment, 'days') + 1; // +1 to include both start and end dates
+      } else {
+        this.durationInDays = 0;
+      }
+    } else {
+      this.durationInDays = 0;
+    }
+  }
+
+  // Form validators
+  private validateWeekend(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const date = moment(control.value);
+    const day = date.day();
+    
+    // 0 is Sunday, 6 is Saturday
+    if (day === 0 || day === 6) {
+      return { weekendNotAllowed: true };
+    }
+    
+    return null;
+  }
+
+  private validateStartDate(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const selectedDate = moment(control.value);
+    const today = moment().startOf('day');
+    
+    // Check if selected date is in the past
+    if (selectedDate.isBefore(today, 'day')) {
+      return { pastDate: true };
+    }
+    
+    // Check if there's at least 1 day notice
+    const noticeDays = selectedDate.diff(today, 'days');
+    if (noticeDays < 1) {
+      return { insufficientNotice: true };
+    }
+    
+    return null;
+  }
+
+  private validateEndDate(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const endDate = moment(control.value);
+    const startDate = this.leaveForm?.get('startDate')?.value 
+      ? moment(this.leaveForm.get('startDate')?.value)
+      : null;
+    
+    if (startDate && endDate.isBefore(startDate, 'day')) {
+      return { endDateBeforeStart: true };
+    }
+    
+    return null;
+  }
+
+  private validateFileType(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const file = control.value as File;
+    if (!this.allowedFileTypes.includes(file.type)) {
+      return { invalidFileType: true };
+    }
+    
+    return null;
+  }
+
+  private validateFileSize(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const file = control.value as File;
+    if (file.size > this.maxFileSize) {
+      return { fileTooLarge: true };
+    }
+    
+    return null;
+  }
+
+  // Form submission
+  onSubmit(): void {
+    if (this.leaveForm.invalid) {
+      this.leaveForm.markAllAsTouched();
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Confirm Leave Request',
+        message: 'Are you sure you want to submit this leave request?',
+        confirmText: 'Submit',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.submitLeaveRequest();
+      }
+    });
+  }
+
+  private submitLeaveRequest(): void {
+    if (this.leaveForm.invalid) return;
+    
+    this.submitting = true;
+    
+    const formValue = this.leaveForm.value;
+    const leaveRequest: Partial<LeaveRequest> = {
+      leaveType: formValue.leaveType!,
+      startDate: moment(formValue.startDate).format('YYYY-MM-DD'),
+      endDate: moment(formValue.endDate).format('YYYY-MM-DD'),
+      reason: formValue.reason || '',
+      status: LeaveStatus.PENDING,
+      attachments: formValue.attachment ? [formValue.attachment.name] : []
+    };
+
+    this.leaveService.createLeaveRequest(leaveRequest as LeaveRequest).subscribe({
+      next: () => {
+        this.snackBar.open('Leave request submitted successfully', 'Close', { duration: 3000 });
+        this.router.navigate(['/leave/my-requests']);
+      },
+      error: (error) => {
+        console.error('Error submitting leave request:', error);
+        this.snackBar.open('Failed to submit leave request', 'Close', { duration: 3000 });
+        this.submitting = false;
+      }
+    });
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.leaveForm.patchValue({ attachment: file });
+      this.leaveForm.get('attachment')?.updateValueAndValidity();
+    }
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/leave/my-requests']);
+  }
+
+  // Helper methods
+  getLeaveTypeDisplay(type: LeaveType): string {
+    return type.split('_')
+      .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
+  getRemainingLeaveDays(leaveType: LeaveType): number {
+    const balance = this.leaveBalances.find(b => b.leaveType === leaveType);
+    return balance ? balance.remainingDays : 0;
+  }
+
+  formatDate(date: Date): string {
+    return moment(date).format('DD/MM/YYYY');
+  }
+
+  calculateWorkingDays(start: Date, end: Date): number {
+    if (!start || !end) return 0;
+    
+    const startDate = moment(start);
+    const endDate = moment(end);
+    let workingDays = 0;
+    
+    while (startDate.isSameOrBefore(endDate)) {
+      const day = startDate.day();
+      if (day !== 0 && day !== 6) { // Skip weekends
+        workingDays++;
+      }
+      startDate.add(1, 'days');
+    }
+    
+    return workingDays;
+  }
+
+  private initializeForm(): void {
+    this.leaveForm = this.fb.group<LeaveRequestForm>({
+      leaveType: new FormControl<LeaveType | null>(null, [Validators.required]),
+      startDate: new FormControl<moment.Moment | null>(null, [
+        Validators.required,
+        this.validateWeekend.bind(this)
+      ]),
+      endDate: new FormControl<moment.Moment | null>(null, [
+        Validators.required,
+        this.validateWeekend.bind(this)
+      ]),
+      reason: new FormControl<string | null>('', [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500)
+      ]),
+      attachment: new FormControl<File | null>(null, [
+        this.validateFileType.bind(this),
+        this.validateFileSize.bind(this)
+      ])
+    });
+  }
+
+  private loadLeaveBalances(): void {
+    this.leaveService.getMyLeaveBalance().subscribe({
+      next: (balance: LeaveBalance) => {
+        // Convert the balance to the extended interface
+        this.leaveBalances = [{
+          leaveType: balance.leaveType,
+          remainingDays: balance.remainingDays,
+          totalDays: balance.totalDays
+        }];
+      },
+      error: (error: any) => {
+        console.error('Error loading leave balances:', error);
+        this.snackBar.open('Failed to load leave balances', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  private setupFormListeners(): void {
+    // Recalculate duration when dates change
+    this.leaveForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.calculateDuration();
+    });
+
+    this.leaveForm.get('endDate')?.valueChanges.subscribe(() => {
+      this.calculateDuration();
+    });
+  }
+
+  private calculateDuration(): void {
+    const startDate = this.leaveForm.get('startDate')?.value;
+    const endDate = this.leaveForm.get('endDate')?.value;
+
+    if (startDate && endDate && startDate.isValid() && endDate.isValid()) {
+      // Add 1 to include both start and end dates
+      this.duration = endDate.diff(startDate, 'days') + 1;
+      
+      // Ensure end date is not before start date
+      if (this.duration < 1) {
+        this.leaveForm.get('endDate')?.setErrors({ invalidEndDate: true });
+        this.duration = 0;
+      }
+    } else {
+      this.duration = 0;
+    }
+  }
+
+  // Form validators
+  private validateWeekend(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const date = moment(control.value);
+    const day = date.day();
+    
+    // 0 is Sunday, 6 is Saturday
+    if (day === 0 || day === 6) {
+      return { weekendNotAllowed: true };
+    }
+    
+    return null;
+  }
+
+  private validateFileType(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const file = control.value as File;
+    if (!this.allowedFileTypes.includes(file.type)) {
+      return { invalidFileType: true };
+    }
+    
+    return null;
+  }
+
+  private validateFileSize(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+    
+    const file = control.value as File;
+    if (file.size > this.maxAttachmentSize) {
+      return { fileTooLarge: true };
+    }
+    
+    return null;
+  }
+
+  // Event handlers
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.leaveForm.patchValue({ attachment: file });
+      this.leaveForm.get('attachment')?.updateValueAndValidity();
+    }
+  }
+
+  onSubmit(): void {
+    if (this.leaveForm.invalid) {
+      this.leaveForm.markAllAsTouched();
+      return;
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Submit Leave Request',
+        message: 'Are you sure you want to submit this leave request?',
+        confirmText: 'Submit',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.submitLeaveRequest();
+      }
+    });
+  }
+
+  private submitLeaveRequest(): void {
+    this.isLoading = true;
+    
+    const formValue = this.leaveForm.value;
+    const leaveRequest: Partial<LeaveRequest> = {
+      leaveType: formValue.leaveType!,
+      startDate: formValue.startDate!.toDate(),
+      endDate: formValue.endDate!.toDate(),
+      reason: formValue.reason!,
+      status: LeaveStatus.PENDING,
+      attachments: formValue.attachment ? [formValue.attachment] : []
+    };
+
+    this.leaveService.createLeaveRequest(leaveRequest as LeaveRequest).subscribe({
+      next: () => {
+        this.snackBar.open('Leave request submitted successfully', 'Close', { duration: 3000 });
+        this.router.navigate(['/leave/my-requests']);
+      },
+      error: (error: any) => {
+        console.error('Error submitting leave request:', error);
+        this.snackBar.open(
+          error.error?.message || 'Failed to submit leave request',
+          'Close',
+          { duration: 5000 }
+        );
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // Helper methods
+  getLeaveBalance(leaveType: LeaveType): number {
+    const balance = this.leaveBalances.find(b => b.leaveType === leaveType);
+    return balance ? balance.remainingDays : 0;
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.leaveForm.get(controlName);
+    
+    if (!control || !control.errors) return '';
+    
+    if (control.hasError('required')) {
+      return 'This field is required';
+    } else if (control.hasError('minlength')) {
+      return `Minimum length is ${control.errors['minlength'].requiredLength} characters`;
+    } else if (control.hasError('maxlength')) {
+      return `Maximum length is ${control.errors['maxlength'].requiredLength} characters`;
+    } else if (control.hasError('weekendNotAllowed')) {
+      return 'Weekend dates are not allowed';
+    } else if (control.hasError('invalidFileType')) {
+      return 'Invalid file type. Allowed types: PDF, JPEG, PNG';
+    } else if (control.hasError('fileTooLarge')) {
+      return `File size exceeds ${this.maxAttachmentSize / (1024 * 1024)}MB`;
+    } else if (control.hasError('invalidEndDate')) {
+      return 'End date must be after start date';
+    }
+    
+    return 'Invalid value';
+  }
+}
+export class LeaveRequestFormComponent implements OnInit {
+  leaveForm: FormGroup;
+  loading = false;
+  submitting = false;
+  leaveTypes = Object.values(LeaveType);
+  today = new Date();
+  minStartDate = new Date();
+  minEndDate = new Date();
+  leaveBalances: LeaveBalance[] = [];
+  selectedFiles: File[] = [];
+  maxFileSize = 5 * 1024 * 1024; // 5MB
+  allowedFileTypes = ['image/jpeg', 'image/png', 'application/pdf'];
+  durationInDays = 0;
+  
+  // Helper to get balance for a specific leave type
+  getLeaveBalance(leaveType: LeaveType): number {
+    const balance = this.leaveBalances.find(b => b.leaveType === leaveType);
+    return balance ? balance.remainingDays : 0;
+  }
+  
+  // Date validation messages
+  dateErrors = {
+    required: 'This field is required',
+    invalidDate: 'Please enter a valid date',
+    startDateAfterEnd: 'Start date must be before end date',
+    endDateBeforeStart: 'End date must be after start date',
+    weekendNotAllowed: 'Weekends are not allowed',
+    insufficientNotice: 'Must submit at least 1 day in advance'
+  };
+
+  constructor(
+    private fb: FormBuilder,
+    private leaveService: LeaveService,
+    private snackBar: MatSnackBar,
+    private router: Router,
+    private dialog: MatDialog,
+    private dateAdapter: DateAdapter<any>
+  ) {
+    // Set the locale for the date adapter
+    this.dateAdapter.setLocale('en-GB'); // Use UK format (DD/MM/YYYY)
+    this.leaveForm = this.createForm();
+  }
+
+  ngOnInit(): void {
+    this.initializeForm();
+    this.loadLeaveBalances();
+    
+    // Subscribe to form value changes to calculate duration
+    this.leaveForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.calculateDuration();
+  confirmLeave(): Observable<boolean> | boolean {
+    // If form is not dirty, allow navigation
+    if (!this.leaveForm?.dirty) {
+      return true;
+    }
+
+    // Show confirmation dialog
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Are you sure you want to leave?',
+        confirmText: 'Leave',
+        cancelText: 'Stay',
+        warn: true
+      }
+    });
+
+    return dialogRef.afterClosed().pipe(
+      map(result => !!result)
+    );
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      leaveType: ['', Validators.required],
+      startDate: ['', [Validators.required, this.validateWeekend.bind(this)]],
+      endDate: ['', [Validators.required, this.validateWeekend.bind(this)]],
+      reason: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]]
+    });
+  }
+
+  private setupFormListeners(): void {
+    // Update minEndDate when startDate changes
+    this.leaveForm.get('startDate')?.valueChanges.subscribe((startDate: Date) => {
+      if (startDate) {
+        this.minEndDate = new Date(startDate);
+        this.leaveForm.get('endDate')?.updateValueAndValidity();
+      }
+    });
+  }
+
+  private loadLeaveBalance(): void {
+    this.loading = true;
+    this.leaveService.getMyLeaveBalance().subscribe({
+      next: (balances: LeaveBalance[]) => {
+        this.leaveBalances = balances;
+        this.loading = false;
+      },
+      error: (error: any) => {
+        console.error('Error loading leave balance:', error);
+        this.snackBar.open('Failed to load leave balance', 'Dismiss', {
+          duration: 3000,
+        });
+        this.loading = false;
+      }
+    });
+  }
+
+  // Custom validator to prevent weekend selection
+  validateWeekend(control: any): { [key: string]: boolean } | null {
+    if (!control.value) return null;
+    
+    const date = new Date(control.value);
+    const day = date.getDay();
+    
+    // 0 = Sunday, 6 = Saturday
+    return day === 0 || day === 6 ? { weekendNotAllowed: true } : null;
+  }
+
+  // Calculate working days between two dates (excluding weekends)
+  calculateWorkingDays(start: Date, end: Date): number {
+    if (!start || !end) return 0;
+    
+    const startDate = moment(start);
+    const endDate = moment(end);
+    let days = 0;
+    
+    while (startDate.isSameOrBefore(endDate)) {
+      // Check if current day is not Saturday (6) or Sunday (0)
+      if (startDate.day() !== 0 && startDate.day() !== 6) {
+        days++;
+      }
+      startDate.add(1, 'days');
+    }
+    
+    return days;
+  }
+
+  // Format date for display
+  formatDate(date: Date): string {
+    return moment(date).format('MMM D, YYYY');
+  }
+
+  // Get leave type display name
+  getLeaveTypeDisplay(type: LeaveType): string {
+    return type.charAt(0) + type.slice(1).toLowerCase();
+  }
+
+  // Get remaining leave days for a specific type
+  getRemainingLeaveDays(leaveType: LeaveType): number {
+    return this.getLeaveBalance(leaveType);
+  }
+
+  // Handle form submission
+  onSubmit(): void {
+    if (this.leaveForm.invalid) {
+      return;
+    }
+
+    this.submitting = true;
+    const leaveRequest: Partial<LeaveRequest> = {
+      leaveType: this.leaveForm.value.leaveType,
+      startDate: moment(this.leaveForm.value.startDate).format('YYYY-MM-DD'),
+      endDate: moment(this.leaveForm.value.endDate).format('YYYY-MM-DD'),
+      reason: this.leaveForm.value.reason,
+      status: LeaveStatus.PENDING
+    };
+
+    this.leaveService.createLeaveRequest(leaveRequest).subscribe({
+      next: (response) => {
+        this.submitting = false;
+        this.snackBar.open('Leave request submitted successfully', 'Close', {
+          duration: 3000,
+        });
+        this.leaveForm.reset();
+        this.router.navigate(['/leave']);
+      },
+      error: (error: any) => {
+        this.submitting = false;
+        console.error('Error submitting leave request:', error);
+        this.snackBar.open(
+          error.message || 'Failed to submit leave request',
+          'Dismiss',
+          { duration: 5000 }
+        );
+      }
+    });
+  }
+
+  // Handle form cancellation
+  onCancel(): void {
+    if (this.leaveForm.dirty) {
+      if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
+        this.router.navigate(['/leaves/list']);
+      }
+    } else {
+      this.router.navigate(['/leaves/list']);
+    }
+  }
+}
