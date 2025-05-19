@@ -13,7 +13,7 @@
           <i class="zmdi zmdi-link"></i> Leave Request
         </a>
       </li>
-      <li>
+      <li *ngIf="currentRole === 'ADMIN'">
         <a [routerLink]="['/admin/leave-requests']">
           <i class="zmdi zmdi-widgets"></i> Services
         </a>
