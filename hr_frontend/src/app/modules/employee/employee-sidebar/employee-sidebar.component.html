@@ -1,1 +1,41 @@
-<p>employee-sidebar works!</p>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h3>Menu</h3>
+  </div>
+  <ul class="nav flex-column">
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/employee/dashboard" routerLinkActive="active">
+        <i class="zmdi zmdi-view-dashboard"></i> Dashboard
+      </a>
+    </li>
+    
+    <!-- My Leave -->
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/employee/leaves" routerLinkActive="active">
+        <i class="zmdi zmdi-calendar-account"></i> My Leave
+      </a>
+    </li>
+    
+    <!-- Attendance -->
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/employee/attendance" routerLinkActive="active">
+        <i class="zmdi zmdi-time"></i> Attendance
+      </a>
+    </li>
+    
+    <!-- My Profile -->
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/employee/profile" routerLinkActive="active">
+        <i class="zmdi zmdi-account"></i> My Profile
+      </a>
+    </li>
+    
+    <!-- Documents -->
+    <li class="nav-item">
+      <a class="nav-link" routerLink="/employee/documents" routerLinkActive="active">
+        <i class="zmdi zmdi-file-text"></i> Documents
+      </a>
+    </li>
+  </ul>
+</div>

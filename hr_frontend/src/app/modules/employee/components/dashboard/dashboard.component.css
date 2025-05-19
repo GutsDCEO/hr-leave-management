@@ -1,0 +1,112 @@
+.dashboard-container {
+  padding: 1.5rem;
+}
+
+.leave-balance-card {
+  transition: transform 0.2s;
+  height: 100%;
+}
+
+.leave-balance-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Status badges */
+.bg-green-100 {
+  background-color: #d1fae5;
+}
+
+.text-green-800 {
+  color: #065f46;
+}
+
+.bg-yellow-100 {
+  background-color: #fef3c7;
+}
+
+.text-yellow-800 {
+  color: #92400e;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+.text-red-800 {
+  color: #991b1b;
+}
+
+/* Table styles */
+.mat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mat-header-cell {
+  font-weight: 600;
+  color: #374151;
+}
+
+.mat-cell, .mat-header-cell {
+  padding: 0.75rem 1rem;
+}
+
+/* Responsive grid */
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Spacing utilities */
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+/* Text utilities */
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-gray-800 {
+  color: #1f2937;
+}
+
+.text-gray-600 {
+  color: #4b5563;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}

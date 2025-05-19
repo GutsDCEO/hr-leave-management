@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-employee-sidebar',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './employee-sidebar.component.html',
-  styleUrl: './employee-sidebar.component.css'
+  styleUrls: ['./employee-sidebar.component.css']
 })
 export class EmployeeSidebarComponent {
-
+  // Add any component logic here
 }

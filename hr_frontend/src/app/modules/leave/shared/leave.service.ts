@@ -19,6 +19,10 @@ export class LeaveService {
     const url = `${environment.apiUrl}/api/leaves`; // Updated endpoint
     console.log('API URL:', url);
     
+    // Log the token that will be sent with the request
+    const token = localStorage.getItem('jwt_token');
+    console.log('JWT Token being sent:', token ? 'Token exists' + (token.length > 20 ? ' (truncated) ' + token.substring(0, 20) + '...' : '') : 'No token found');
+    
     return this.http.get<any>(url, { 
       params,
       observe: 'response' // Get full HTTP response

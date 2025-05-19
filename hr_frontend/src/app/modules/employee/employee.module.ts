@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { EmployeeComponent } from './employee.component';
+import { EmployeeRoutingModule } from './employee-routing.module';
 
 // Angular Material Modules
 import { MatCardModule } from '@angular/material/card';
@@ -13,6 +13,11 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 @NgModule({
   declarations: [
@@ -20,9 +25,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   ],
   imports: [
     CommonModule,
-    RouterModule.forChild([
-      { path: '', component: EmployeeComponent }
-    ]),
+    EmployeeRoutingModule,
     // Angular Material Modules
     MatCardModule,
     MatButtonModule,
@@ -32,7 +35,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDialogModule,
     MatMenuModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule
   ]
 })
 export class EmployeeModule { }

@@ -8,15 +8,18 @@
       <mat-tab-group [selectedIndex]="activeTab === 'list' ? 0 : 1" (selectedTabChange)="onTabChange($event)">
         <mat-tab label="My Leave Requests">
           <div class="tab-content">
-            <router-outlet></router-outlet>
+            <!-- Content will be dynamically loaded here -->
           </div>
         </mat-tab>
         <mat-tab label="Request Leave">
           <div class="tab-content">
-            <router-outlet></router-outlet>
+            <!-- Content will be dynamically loaded here -->
           </div>
         </mat-tab>
       </mat-tab-group>
+      
+      <!-- Single router outlet for all child components -->
+      <router-outlet></router-outlet>
     </mat-card-content>
   </mat-card>
 </div>

@@ -126,7 +126,7 @@
         <!-- Form Actions -->
         <div class="row">
           <div class="col-12 text-end">
-            <button type="button" mat-stroked-button color="warn" class="me-2" (click)="onCancel()" [disabled]="submitting">
+            <button type="button" mat-stroked-button color="warn" class="me-2" (click)="$event.preventDefault(); onCancel()" [disabled]="submitting">
               <mat-icon>cancel</mat-icon> Cancel
             </button>
             <button type="submit" mat-flat-button color="primary" [disabled]="leaveForm.invalid || submitting">

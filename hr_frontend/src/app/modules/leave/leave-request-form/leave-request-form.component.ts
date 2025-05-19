@@ -706,33 +706,44 @@ export class LeaveRequestFormComponent implements OnInit {
   }
 
   onCancel(): void {
-    if (this.leaveForm.dirty && !this.leaveForm.pristine) {
-      const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-        width: '350px',
-        data: {
-          title: 'Confirm Cancel',
-          message: 'Are you sure you want to cancel? Any unsaved changes will be lost.',
-          confirmText: 'Yes, Cancel',
-          cancelText: 'No, Continue Editing',
-          warn: true
-        }
-      });
+    console.log('Cancel button clicked');
+    // Always show confirmation dialog when cancel is clicked
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Confirm Leave',
+        message: 'Are you sure you want to leave this page?',
+        confirmText: 'Leave',
+        cancelText: 'Stay',
+        warn: true
+      },
+      disableClose: true // Prevent closing by clicking outside
+    });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.router.navigate(['/leaves/list']).catch(err => {
-            console.error('Navigation error:', err);
-            // Fallback to root if navigation fails
-            this.router.navigate(['/']);
-          });
-        }
-      });
-    } else {
-      this.router.navigate(['/leaves/list']).catch(err => {
-        console.error('Navigation error:', err);
-        // Fallback to root if navigation fails
-        this.router.navigate(['/']);
-      });
-    }
+    console.log('Dialog opened, waiting for user choice...');
+    
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      console.log('Dialog closed with result:', result);
+      if (result === true) {
+        console.log('User chose to leave, navigating away...');
+        this.navigateAway();
+      } else {
+        console.log('User chose to stay on the page');
+      }
+    });
+  }
+
+  private navigateAway(): void {
+    console.log('Attempting to navigate to home page...');
+    // Use window.location.replace to ensure navigation happens
+    setTimeout(() => {
+      try {
+        window.location.replace('/');
+      } catch (error) {
+        console.error('Navigation error:', error);
+        // If replace fails, try href as last resort
+        window.location.href = '/';
+      }
+    }, 0);
   }
 }

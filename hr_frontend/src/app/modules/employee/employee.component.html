@@ -1,9 +1,5 @@
 <div class="employee-dashboard p-4">
-  <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Employee Dashboard</h1>
-    <p class="text-gray-600">Welcome back! Here's your leave overview</p>
-  </div>
+  <router-outlet></router-outlet>
 
   <!-- Quick Actions -->
   <div class="mb-8">
@@ -11,10 +7,6 @@
       <button mat-raised-button color="primary" (click)="openLeaveRequestForm()" class="flex items-center gap-2">
         <mat-icon>add</mat-icon>
         New Leave Request
-      </button>
-      <button mat-stroked-button class="flex items-center gap-2">
-        <mat-icon>calendar_month</mat-icon>
-        View Calendar
       </button>
     </div>
   </div>
@@ -42,7 +34,7 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Recent Leave Requests</mat-card-title>
-      <button mat-button color="primary" [routerLink]="['/leaves']" class="ml-auto">
+      <button mat-button color="primary" [routerLink]="['/employee/leaves']" class="ml-auto">
         View All
       </button>
     </mat-card-header>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTableModule } from '@angular/material/table';
@@ -24,6 +24,7 @@ interface LeaveBalanceDisplay extends LeaveBalance {
   imports: [
     CommonModule,
     RouterLink,
+    RouterOutlet,
     MatCardModule,
     MatButtonModule,
     MatTableModule,
