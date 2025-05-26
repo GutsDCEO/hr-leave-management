@@ -34,7 +34,7 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>Recent Leave Requests</mat-card-title>
-      <button mat-button color="primary" [routerLink]="['/employee/leaves']" class="ml-auto">
+      <button mat-button color="primary" [routerLink]="['/employee/leave-requests']" class="ml-auto">
         View All
       </button>
     </mat-card-header>
@@ -109,15 +109,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <div *ngIf="!loading && recentRequests.length === 0" class="text-center py-8 text-gray-500">
-        <mat-icon class="text-4xl mb-2">event_available</mat-icon>
-        <p>No leave requests found</p>
-        <p class="text-xs text-gray-400 mt-2">If you expected to see requests, please check the console for errors.</p>
-        <button mat-button color="primary" (click)="openLeaveRequestForm()" class="mt-4">
-          <mat-icon>add</mat-icon>
-          Request Time Off
-        </button>
-      </div>
+      
     </mat-card-content>
   </mat-card>
 </div>

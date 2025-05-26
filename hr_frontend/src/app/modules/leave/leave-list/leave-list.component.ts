@@ -10,15 +10,23 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCardModule } from '@angular/material/card';
+import { LeaveRequestsService, LeaveRequest as ApiLeaveRequest } from '../../../core/services/leave-requests.service';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
 
-// Simple interfaces
+// Interface to map API response to our component's data structure
 interface LeaveRequest {
-  id?: string;
+  id?: number | string;
   startDate: string | Date;
   endDate: string | Date;
   type: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
   reason?: string;
+  requestedAt?: string | Date;
+  reviewedAt?: string | Date;
+  employeeName?: string;
+  // Added for display purposes
+  requestDate?: string | Date;
 }
 
 @Component({
@@ -27,11 +35,13 @@ interface LeaveRequest {
   imports: [
     CommonModule, 
     RouterModule,
+    FormsModule,
     MatButtonModule,
     MatTableModule,
     MatIconModule,
     MatMenuModule,
     MatFormFieldModule,
+    MatInputModule,
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
@@ -43,42 +53,50 @@ interface LeaveRequest {
 export class LeaveListComponent implements OnInit {
   dataSource: LeaveRequest[] = [];
   loading = false;
-  displayedColumns: string[] = ['startDate', 'endDate', 'type', 'status', 'actions'];
+  displayedColumns: string[] = ['startDate', 'endDate', 'type', 'status', 'requestDate', 'actions'];
   statusFilter = '';
   typeFilter = '';
   startDateFilter: Date | null = null;
   endDateFilter: Date | null = null;
+  totalPages = 0;
+  currentPage = 0;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private leaveService: LeaveRequestsService) {}
 
   ngOnInit(): void {
     this.loadLeaveRequests();
   }
 
-  loadLeaveRequests(): void {
+  loadLeaveRequests(page = 0): void {
     this.loading = true;
-    // Simulate API call
-    setTimeout(() => {
-      this.dataSource = [
-        {
-          id: '1',
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 86400000),
-          type: 'ANNUAL_LEAVE',
-          status: 'PENDING',
-          reason: 'Vacation'
-        },
-        {
-          id: '2',
-          startDate: new Date(Date.now() - 86400000 * 5),
-          endDate: new Date(Date.now() - 86400000 * 2),
-          type: 'SICK_LEAVE',
-          status: 'APPROVED',
-          reason: 'Medical checkup'
-        }
-      ];
-      this.loading = false;
-    }, 1000);
+    this.leaveService.getEmployeeLeaveRequests(page, 10, this.statusFilter).subscribe({
+      next: (response) => {
+        // Convert API response to our component's data structure
+        this.dataSource = response.content.map(item => {
+          return {
+            id: item.id,
+            startDate: item.startDate,
+            endDate: item.endDate,
+            type: item.type,
+            status: item.status?.toUpperCase() as any,
+            reason: item.reason,
+            employeeName: item.employeeName,
+            // Map requestedAt to requestDate for display
+            requestDate: item.startDate
+          };
+        });
+        this.totalPages = response.totalPages;
+        this.currentPage = response.number;
+        this.loading = false;
+        console.log('Employee leave requests loaded:', this.dataSource);
+      },
+      error: (error) => {
+        console.error('Error loading employee leave requests:', error);
+        this.loading = false;
+        // Show error message
+        // For now we'll just log it, but in a real app you might show a notification
+      }
+    });
   }
 
   applyFilters(): void {
@@ -97,11 +115,11 @@ export class LeaveListComponent implements OnInit {
     this.router.navigate(['/employee/leaves/request']);
   }
 
-  onViewDetails(id: string): void {
+  onViewDetails(id: string | number): void {
     this.router.navigate(['/employee/leaves', id]);
   }
 
-  onEditRequest(id: string): void {
+  onEditRequest(id: string | number): void {
     this.router.navigate(['/employee/leaves/request', id]);
   }
 

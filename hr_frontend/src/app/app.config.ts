@@ -1,8 +1,10 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { jwtInterceptorFn } from './core/interceptors/JwtInterceptor';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { MaterialModule } from './shared/material.module';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -10,6 +12,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(
       withInterceptors([jwtInterceptorFn])
-    )
+    ),
+    provideAnimations(),
+    importProvidersFrom(MaterialModule)
   ]
 };

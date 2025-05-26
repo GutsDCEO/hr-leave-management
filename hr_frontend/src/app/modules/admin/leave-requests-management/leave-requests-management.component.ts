@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { LeaveRequestsService } from '../../../core/services/leave-requests.service';
+import { LeaveRequestsService, LeaveRequest } from '../../../core/services/leave-requests.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,10 +10,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./leave-requests-management.component.css']
 })
 export class LeaveRequestsManagementComponent implements OnInit {
-  leaves: any[] = [];
+  leaves: LeaveRequest[] = [];
   totalPages = 0;
   currentPage = 0;
   statusFilter: string | undefined;
+  loading = false;
+  actionInProgress = false;
 
   constructor(private leaveService: LeaveRequestsService) {}
 
@@ -22,10 +24,27 @@ export class LeaveRequestsManagementComponent implements OnInit {
   }
 
   loadLeaves(page = 0) {
-    this.leaveService.getLeaves(page, 10, this.statusFilter).subscribe(data => {
-      this.leaves = data.content;
-      this.totalPages = data.totalPages;
-      this.currentPage = data.number;
+    this.loading = true;
+    this.leaveService.getLeaves(page, 10, this.statusFilter).subscribe({
+      next: (data) => {
+        // Make sure we're processing the statuses correctly
+        this.leaves = data.content.map(leave => {
+          // Ensure status is a string and uppercase for consistent comparison
+          if (leave.status) {
+            leave.status = leave.status.toString().toUpperCase();
+          }
+          console.log(`Leave ID: ${leave.id}, Status: ${leave.status}`);
+          return leave;
+        });
+        
+        this.totalPages = data.totalPages;
+        this.currentPage = data.number;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading leave requests', error);
+        this.loading = false;
+      }
     });
   }
 
@@ -36,5 +55,51 @@ export class LeaveRequestsManagementComponent implements OnInit {
   onStatusChange(newStatus: string) {
     this.statusFilter = newStatus;
     this.loadLeaves(0);
+  }
+
+  approveLeave(leaveId: number) {
+    if (this.actionInProgress) return;
+    
+    this.actionInProgress = true;
+    // Pass 'admin' as the reviewer parameter
+    this.leaveService.approveLeaveRequest(leaveId, 'admin').subscribe({
+      next: (updatedLeave) => {
+        // Update the leave request in the local array
+        const index = this.leaves.findIndex(leave => leave.id === leaveId);
+        if (index !== -1) {
+          this.leaves[index].status = 'APPROVED';
+        }
+        this.actionInProgress = false;
+        console.log('Leave request approved successfully');
+      },
+      error: (error) => {
+        console.error('Error approving leave request', error);
+        this.actionInProgress = false;
+        // Optionally show an error notification here
+      }
+    });
+  }
+
+  rejectLeave(leaveId: number) {
+    if (this.actionInProgress) return;
+    
+    this.actionInProgress = true;
+    // Pass 'admin' as the reviewer and a reason for the rejection
+    this.leaveService.rejectLeaveRequest(leaveId, 'admin', 'Request rejected by admin').subscribe({
+      next: (updatedLeave) => {
+        // Update the leave request in the local array
+        const index = this.leaves.findIndex(leave => leave.id === leaveId);
+        if (index !== -1) {
+          this.leaves[index].status = 'REJECTED';
+        }
+        this.actionInProgress = false;
+        console.log('Leave request rejected successfully');
+      },
+      error: (error) => {
+        console.error('Error rejecting leave request', error);
+        this.actionInProgress = false;
+        // Optionally show an error notification here
+      }
+    });
   }
 }

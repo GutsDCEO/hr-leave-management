@@ -4,7 +4,7 @@
     <!-- Status Filter -->
     <div class="filter-container">
       <label for="statusFilter">Filter by Status:</label>
-      <select id="statusFilter" #statusSelect (change)="onStatusChange(statusSelect.value)">
+      <select id="statusFilter" #statusSelect (change)="onStatusChange(statusSelect.value)" class="status-dropdown">
         <option value="">All</option>
         <option value="PENDING">Pending</option>
         <option value="APPROVED">Approved</option>
@@ -12,8 +12,14 @@
       </select>
     </div>
   
+    <!-- Loading Indicator -->
+    <div *ngIf="loading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>Loading leave requests...</p>
+    </div>
+
     <!-- Leave Requests Table -->
-    <div class="table-responsive">
+    <div class="table-responsive" *ngIf="!loading">
       <table class="leave-requests-table">
         <thead>
           <tr>
@@ -26,22 +32,60 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let leave of leaves">
-            <td>{{ leave.employeeName }}</td>
-            <td>{{ leave.startDate }} - {{ leave.endDate }}</td>
-            <td>{{ leave.type }}</td>
+          <tr *ngFor="let leave of leaves" [class.highlight-row]="leave.status === 'PENDING'">
+            <td class="employee-name">{{ leave.employeeName }}</td>
+            <td class="dates">
+              <div class="date-range">
+                <span class="date-label">From:</span> {{ leave.startDate | date:'mediumDate' }}
+              </div>
+              <div class="date-range">
+                <span class="date-label">To:</span> {{ leave.endDate | date:'mediumDate' }}
+              </div>
+            </td>
             <td>
-              <span [ngClass]="{
-                'status-pending': leave.status === 'PENDING',
-                'status-approved': leave.status === 'APPROVED',
-                'status-rejected': leave.status === 'REJECTED'
+              <span class="leave-type-badge">{{ leave.type }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'status-pending': leave.status.toUpperCase() === 'PENDING',
+                'status-approved': leave.status.toUpperCase() === 'APPROVED',
+                'status-rejected': leave.status.toUpperCase() === 'REJECTED'
               }">{{ leave.status }}</span>
             </td>
-            <td>{{ leave.reason }}</td>
-            <td>
-              <!-- Approve/Reject actions -->
-              <button *ngIf="leave.status === 'PENDING'" class="approve-btn">Approve</button>
-              <button *ngIf="leave.status === 'PENDING'" class="reject-btn">Reject</button>
+            <td class="reason-cell">
+              <div class="reason-text">{{ leave.reason }}</div>
+            </td>
+            <td class="actions-cell">
+              <!-- Status indicator for non-pending requests -->
+              <div class="status-badge-container" *ngIf="leave.status.toUpperCase() !== 'PENDING'">
+                <span class="status-indicator"
+                  [ngClass]="{
+                    'approved-indicator': leave.status.toUpperCase() === 'APPROVED',
+                    'rejected-indicator': leave.status.toUpperCase() === 'REJECTED'
+                  }"></span>
+                <div class="status-message-large">
+                  <span *ngIf="leave.status.toUpperCase() === 'APPROVED'" class="approved-message">Approved</span>
+                  <span *ngIf="leave.status.toUpperCase() === 'REJECTED'" class="rejected-message">Rejected</span>
+                </div>
+              </div>
+
+              <!-- Action buttons - always visible but disabled for non-pending -->
+              <div class="action-buttons">
+                <button 
+                  (click)="approveLeave(leave.id)" 
+                  class="approve-btn" 
+                  [disabled]="actionInProgress || leave.status.toUpperCase() !== 'PENDING'"
+                  [title]="leave.status.toUpperCase() === 'PENDING' ? 'Approve this leave request' : 'This request has already been processed'">
+                  <span class="button-text">Approve</span>
+                </button>
+                <button 
+                  (click)="rejectLeave(leave.id)" 
+                  class="reject-btn" 
+                  [disabled]="actionInProgress || leave.status.toUpperCase() !== 'PENDING'"
+                  [title]="leave.status.toUpperCase() === 'PENDING' ? 'Reject this leave request' : 'This request has already been processed'">
+                  <span class="button-text">Reject</span>
+                </button>
+              </div>
             </td>
           </tr>
           <tr *ngIf="leaves.length === 0">
