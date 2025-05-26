@@ -1,0 +1,109 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800">Employee Dashboard</h1>
+    <p class="text-gray-600">Welcome back! Here's your leave overview</p>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="mb-8">
+    <div class="flex flex-wrap gap-4 mb-4">
+      <button mat-raised-button color="primary" (click)="openLeaveRequestForm()" class="flex items-center gap-2">
+        <mat-icon>add</mat-icon>
+        New Leave Request
+      </button>
+    </div>
+  </div>
+
+  <!-- Leave Balance Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <mat-card *ngFor="let balance of leaveBalances" class="leave-balance-card">
+      <mat-card-header>
+        <mat-card-title>{{balance.type}}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-3xl font-bold">{{balance.remaining}}</div>
+            <div class="text-sm text-gray-500">Days Remaining</div>
+          </div>
+          <div class="text-right">
+            <div class="text-sm">Total: {{balance.days}} days</div>
+            <div class="text-sm">Used: {{balance.used}} days</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Recent Leave Requests -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Recent Leave Requests</mat-card-title>
+      <button mat-button color="primary" [routerLink]="['/employee/leaves']" class="ml-auto">
+        View All
+      </button>
+    </mat-card-header>
+    <mat-card-content>
+      <table mat-table [dataSource]="recentRequests" class="w-full">
+        <!-- Request ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef>Request ID</th>
+          <td mat-cell *matCellDef="let element">{{element.id}}</td>
+        </ng-container>
+
+        <!-- Type Column -->
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef>Type</th>
+          <td mat-cell *matCellDef="let element">{{element.type}}</td>
+        </ng-container>
+
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef>Date</th>
+          <td mat-cell *matCellDef="let element">
+            {{element.startDate}} - {{element.endDate}}
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let element">
+            <span [ngClass]="{
+              'bg-green-100 text-green-800': element.status === 'Approved',
+              'bg-yellow-100 text-yellow-800': element.status === 'Pending',
+              'bg-red-100 text-red-800': element.status === 'Rejected',
+              'px-2 py-1 rounded-full text-xs font-medium': true
+            }">
+              {{element.status}}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item [routerLink]="['/employee/leaves', element.id]">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item *ngIf="element.status === 'Pending'" (click)="cancelRequest(element.id)">
+                <mat-icon>cancel</mat-icon>
+                <span>Cancel Request</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['id', 'type', 'date', 'status', 'actions']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['id', 'type', 'date', 'status', 'actions'];"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>

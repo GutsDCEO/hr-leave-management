@@ -18,6 +18,18 @@ const routes: Routes = [
     path: 'employee',
     loadChildren: () => import('./modules/employee/employee.module').then(m => m.EmployeeModule),
     canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'EMPLOYEE' },
+    children: [
+      {
+        path: 'leaves',
+        loadChildren: () => import('./modules/leave/leave.module').then(m => m.LeaveModule)
+      }
+    ]
+  },
+  {
+    path: 'leaves',
+    loadChildren: () => import('./modules/leave/leave.module').then(m => m.LeaveModule),
+    canActivate: [AuthGuard, RoleGuard],
     data: { role: 'EMPLOYEE' }
   },
   

@@ -1,0 +1,144 @@
+<div class="leave-detail-container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <button mat-stroked-button (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon> Back to List
+    </button>
+    
+    <div *ngIf="leaveRequest" class="d-flex align-items-center">
+      <span class="me-3">
+        Status: 
+        <span class="badge" [ngClass]="getStatusBadgeClass(leaveRequest.status)">
+          {{ leaveRequest.status | titlecase }}
+        </span>
+      </span>
+      
+      <button *ngIf="canCancelRequest()" 
+              mat-stroked-button 
+              color="warn" 
+              (click)="onCancelRequest()"
+              class="ms-2">
+        <mat-icon>cancel</mat-icon> Cancel Request
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading Indicator -->
+  <div *ngIf="loading" class="text-center py-5">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p class="mt-3">Loading leave request details...</p>
+  </div>
+
+  <!-- Leave Details -->
+  <mat-card *ngIf="!loading && leaveRequest" class="mb-4">
+    <mat-card-header>
+      <mat-card-title>
+        {{ getLeaveTypeDisplay(leaveRequest.type) }} Leave
+      </mat-card-title>
+      <mat-card-subtitle>
+        Requested on {{ formatDate(leaveRequest.requestedAt) }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="row">
+        <!-- Leave Dates -->
+        <div class="col-md-6">
+          <div class="detail-section">
+            <h3 class="detail-section-title">
+              <mat-icon class="me-2">event</mat-icon>
+              Leave Period
+            </h3>
+            <div class="detail-item">
+              <span class="detail-label">Start Date:</span>
+              <span class="detail-value">{{ formatDate(leaveRequest.startDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">End Date:</span>
+              <span class="detail-value">{{ formatDate(leaveRequest.endDate) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Duration:</span>
+              <span class="detail-value">
+                {{ calculateWorkingDays(leaveRequest.startDate, leaveRequest.endDate) }} 
+                working days
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Request Details -->
+        <div class="col-md-6">
+          <div class="detail-section">
+            <h3 class="detail-section-title">
+              <mat-icon class="me-2">info</mat-icon>
+              Request Details
+            </h3>
+            <div class="detail-item">
+              <span class="detail-label">Type:</span>
+              <span class="detail-value">{{ getLeaveTypeDisplay(leaveRequest.type) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Status:</span>
+              <span class="detail-value">
+                <span class="badge" [ngClass]="getStatusBadgeClass(leaveRequest.status)">
+                  {{ leaveRequest.status | titlecase }}
+                </span>
+              </span>
+            </div>
+            <div *ngIf="leaveRequest.requestedAt" class="detail-item">
+              <span class="detail-label">Requested On:</span>
+              <span class="detail-value">{{ formatDate(leaveRequest.requestedAt) }}</span>
+            </div>
+            <div *ngIf="leaveRequest.reviewedAt" class="detail-item">
+              <span class="detail-label">
+                {{ leaveRequest.status === 'APPROVED' ? 'Approved' : 'Rejected' }} On:
+              </span>
+              <span class="detail-value">{{ formatDate(leaveRequest.reviewedAt) }}</span>
+            </div>
+            <div *ngIf="leaveRequest.reviewer" class="detail-item">
+              <span class="detail-label">
+                {{ leaveRequest.status === 'APPROVED' ? 'Approved' : 'Rejected' }} By:
+              </span>
+              <span class="detail-value">{{ leaveRequest.reviewer }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reason -->
+      <div class="detail-section mt-4">
+        <h3 class="detail-section-title">
+          <mat-icon class="me-2">notes</mat-icon>
+          Reason for Leave
+        </h3>
+        <div class="reason-box">
+          {{ leaveRequest.reason || 'No reason provided' }}
+        </div>
+      </div>
+
+      <!-- Rejection Reason -->
+      <div *ngIf="leaveRequest.status === 'REJECTED' && leaveRequest.rejectionReason" class="detail-section mt-4">
+        <h3 class="detail-section-title text-danger">
+          <mat-icon class="me-2">cancel</mat-icon>
+          Rejection Reason
+        </h3>
+        <div class="rejection-reason-box">
+          {{ leaveRequest.rejectionReason }}
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Actions -->
+  <div *ngIf="!loading && leaveRequest" class="text-end">
+    <button mat-stroked-button class="me-2" (click)="onBack()">
+      <mat-icon>arrow_back</mat-icon> Back to List
+    </button>
+    <button *ngIf="canCancelRequest()" 
+            mat-flat-button 
+            color="warn" 
+            (click)="onCancelRequest()">
+      <mat-icon>cancel</mat-icon> Cancel Request
+    </button>
+  </div>
+</div>

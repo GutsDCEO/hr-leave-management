@@ -1,0 +1,66 @@
+.leave-management-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  mat-card {
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+
+    mat-card-header {
+      background-color: #f5f5f5;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e0e0e0;
+
+      mat-card-title {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 500;
+        color: #333;
+      }
+    }
+
+    mat-card-content {
+      padding: 24px;
+
+      .tab-content {
+        padding: 16px 0;
+      }
+    }
+  }
+
+  .mat-tab-group {
+    margin-top: 16px;
+  }
+
+  .mat-tab-label {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 1;
+    padding: 0 24px;
+    min-width: 160px;
+    height: 48px;
+  }
+
+  .mat-tab-label-active {
+    color: #3f51b5;
+  }
+
+  .mat-ink-bar {
+    background-color: #3f51b5;
+  }
+
+  @media (max-width: 600px) {
+    padding: 12px;
+
+    mat-card {
+      margin-bottom: 12px;
+    }
+
+    mat-card-content {
+      padding: 16px !important;
+    }
+  }
+}
