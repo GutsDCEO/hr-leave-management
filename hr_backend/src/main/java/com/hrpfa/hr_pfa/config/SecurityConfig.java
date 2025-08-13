@@ -47,7 +47,7 @@ public class SecurityConfig {
                                 "/api/user/hash-password",
                                 "/api/test/**"  // Allow test endpoints
                                 )
-                                .permitAll()
+                                   .permitAll()
                                 // Employees and Admins can view leave requests (GET)
                                 .requestMatchers(HttpMethod.GET, "/api/leaves/**").hasAnyRole("ADMIN", "EMPLOYEE")
                         // Role-based access (Open/Closed: Add new roles without modifying this)

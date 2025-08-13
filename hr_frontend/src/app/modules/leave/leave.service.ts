@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+
 
 import { LeaveRequest } from './leave-request.model';
 import { LeaveBalance } from './leave-balance.model';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class LeaveService {
   private apiUrl = `${environment.apiUrl}/api/leaves`;
 

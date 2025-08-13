@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 const materialModules = [
   MatButtonModule,
@@ -28,11 +29,12 @@ const materialModules = [
   MatNativeDateModule,
   MatSelectModule,
   MatProgressSpinnerModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatPaginatorModule
 ];
 
 @NgModule({
   imports: [...materialModules],
   exports: [...materialModules],
 })
-export class MaterialModule {}
+export class MaterialModule { }

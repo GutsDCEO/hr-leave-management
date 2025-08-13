@@ -2,9 +2,9 @@
   <!-- Sidebar -->
   <div id="sidebar">
     <ul class="table">
-    
+
       <li *ngIf="currentRole === 'ADMIN'">
-        <a href="#">
+        <a [routerLink]="['/admin/dashboard']" routerLinkActive="active">
           <i class="zmdi zmdi-view-dashboard"></i> Dashboard
         </a>
       </li>
@@ -14,8 +14,8 @@
         </a>
       </li>
       <li *ngIf="currentRole === 'ADMIN'">
-        <a [routerLink]="['/admin/leave-requests']">
-          <i class="zmdi zmdi-widgets"></i> Services
+        <a [routerLink]="['/admin/leave-requests']" routerLinkActive="active">
+          <i class="zmdi zmdi-widgets"></i> Leave Requests
         </a>
       </li>
       <li>
@@ -28,7 +28,7 @@
           <i class="zmdi zmdi-info-outline"></i> About
         </a>
       </li>
-      
+
       <li>
         <a href="#">
           <i class="zmdi zmdi-comment-more"></i> Contact
@@ -36,5 +36,5 @@
       </li>
     </ul>
   </div>
-  
+
 </div>

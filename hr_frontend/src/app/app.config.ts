@@ -5,6 +5,7 @@ import { routes } from './app.routes';
 import { jwtInterceptorFn } from './core/interceptors/JwtInterceptor';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MaterialModule } from './shared/material.module';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +15,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([jwtInterceptorFn])
     ),
     provideAnimations(),
-    importProvidersFrom(MaterialModule)
+    importProvidersFrom(MaterialModule, BrowserAnimationsModule)
   ]
 };

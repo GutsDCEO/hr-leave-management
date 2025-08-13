@@ -1,0 +1,77 @@
+<div class="employees-list">
+    <!-- TEST MESSAGE - REMOVE AFTER DEBUGGING -->
+    <div style="background: yellow; padding: 10px; margin: 10px; border: 2px solid red;">
+        <h3>🚨 DEBUG: Component is loading! 🚨</h3>
+        <p>If you see this, the component is working but there might be an issue with data loading.</p>
+        <p>Loading: {{loading}}</p>
+        <p>Data count: {{data.length}}</p>
+        <p>Total: {{total}}</p>
+    </div>
+    <!-- END TEST MESSAGE -->
+
+    <h2>Employees</h2>
+
+    <div class="filters" style="display:flex; gap:16px; align-items:center; margin: 12px 0;">
+        <mat-form-field appearance="outline" style="max-width:280px; width:100%">
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="q" (ngModelChange)="pageIndex=0; load()" placeholder="Name or email" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" style="width:200px;">
+            <mat-label>Role</mat-label>
+            <mat-select [(ngModel)]="role" (selectionChange)="pageIndex=0; load()">
+                <mat-option value="">All</mat-option>
+                <mat-option value="EMPLOYEE">Employee</mat-option>
+                <mat-option value="ADMIN">Admin</mat-option>
+                <mat-option value="MANAGER">Manager</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" style="text-align: center; padding: 20px;">
+        <mat-spinner></mat-spinner>
+        <p>Loading employees...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="!loading && data.length === 0 && (q || role)" style="text-align: center; padding: 20px; color: #666;">
+        <p>No employees found matching your criteria.</p>
+    </div>
+
+    <!-- Data Table -->
+    <table *ngIf="!loading && data.length > 0" mat-table [dataSource]="data" class="mat-elevation-z1"
+        style="width:100%">
+        <ng-container matColumnDef="firstName">
+            <th mat-header-cell *matHeaderCellDef>First Name</th>
+            <td mat-cell *matCellDef="let u">{{u.firstName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="lastName">
+            <th mat-header-cell *matHeaderCellDef>Last Name</th>
+            <td mat-cell *matCellDef="let u">{{u.lastName}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u">{{u.email}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="phone">
+            <th mat-header-cell *matHeaderCellDef>Phone</th>
+            <td mat-cell *matCellDef="let u">{{u.phone || '—'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Role</th>
+            <td mat-cell *matCellDef="let u">{{u.role}}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <!-- Paginator -->
+    <mat-paginator *ngIf="!loading && total > 0" [length]="total" [pageIndex]="pageIndex" [pageSize]="pageSize"
+        [pageSizeOptions]="[5,10,20]" (page)="onPage($event)" />
+</div>

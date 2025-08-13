@@ -1,0 +1,78 @@
+<div class="container-fluid">
+  <div *ngIf="loading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && dashboardStats">
+    <div class="row">
+      <!-- Metric Cards -->
+      <div class="col-md-3">
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-card-title>Total Employees</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <h2>{{ dashboardStats.totalEmployees }}</h2>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-md-3">
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-card-title>Pending Leaves</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <h2>{{ dashboardStats.pendingLeaves }}</h2>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-md-3">
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-card-title>Leaves This Month</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <h2>{{ dashboardStats.totalLeavesThisMonth }}</h2>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      <div class="col-md-3">
+        <mat-card class="metric-card">
+          <mat-card-header>
+            <mat-card-title>Approval Rate</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <h2>{{ dashboardStats.leaveApprovalRate | percent:'1.0-0' }}</h2>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <mat-card>
+          <mat-card-header>
+            <mat-card-title>Leave Requests Breakdown (This Month)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="chart-container">
+              <ngx-charts-pie-chart
+                [view]="view"
+                [scheme]="colorScheme"
+                [results]="leaveStatsChartData"
+                [gradient]="gradient"
+                [legend]="showLegend"
+                [legendTitle]="'Leave Status'"
+                [legendPosition]="legendPosition"
+                [labels]="showLabels"
+                [doughnut]="isDoughnut"
+                (select)="onChartSelect($event)">
+              </ngx-charts-pie-chart>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
