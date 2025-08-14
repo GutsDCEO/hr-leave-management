@@ -74,3 +74,139 @@ footer {
 }
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Add to src/styles.css - Global Snackbar Styles */
+
+/* Success Snackbar */
+.success-snackbar {
+    --mdc-snackbar-container-color: #4caf50;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+  
+  .success-snackbar .mat-mdc-snack-bar-container {
+    background: linear-gradient(135deg, #4caf50, #66bb6a);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  }
+  
+  /* Error Snackbar */
+  .error-snackbar {
+    --mdc-snackbar-container-color: #f44336;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+  
+  .error-snackbar .mat-mdc-snack-bar-container {
+    background: linear-gradient(135deg, #f44336, #ef5350);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+  }
+  
+  /* Warning Snackbar */
+  .warning-snackbar {
+    --mdc-snackbar-container-color: #ff9800;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+  
+  .warning-snackbar .mat-mdc-snack-bar-container {
+    background: linear-gradient(135deg, #ff9800, #ffa726);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+  }
+  
+  /* Info Snackbar */
+  .info-snackbar {
+    --mdc-snackbar-container-color: #2196f3;
+    --mdc-snackbar-supporting-text-color: #ffffff;
+    --mat-snack-bar-button-color: #ffffff;
+  }
+  
+  .info-snackbar .mat-mdc-snack-bar-container {
+    background: linear-gradient(135deg, #2196f3, #42a5f5);
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+  }
+  
+  /* General snackbar improvements */
+  .mat-mdc-snack-bar-container {
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  .mat-mdc-snack-bar-action {
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  /* Dashboard specific loading states */
+  .dashboard-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+  }
+  
+  .dashboard-loading .mat-mdc-progress-spinner {
+    margin-bottom: 20px;
+  }
+  
+  .dashboard-loading p {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  
+  /* Enhanced card hover effects */
+  .mat-mdc-card {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  
+  .mat-mdc-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Smooth animations for dashboard elements */
+  .fade-in {
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .slide-in-up {
+    animation: slideInUp 0.6s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Responsive improvements */
+  @media (max-width: 768px) {
+    .mat-mdc-snack-bar-container {
+      margin: 16px !important;
+      max-width: calc(100vw - 32px) !important;
+      min-width: auto !important;
+    }
+  }

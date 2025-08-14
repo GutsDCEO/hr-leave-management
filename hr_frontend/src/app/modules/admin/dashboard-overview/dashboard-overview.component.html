@@ -1,78 +1,296 @@
-<div class="container-fluid">
-  <div *ngIf="loading" class="loading-spinner">
-    <mat-spinner></mat-spinner>
+<!-- src/app/modules/admin/dashboard-overview/dashboard-overview.component.html -->
+<div class="dashboard-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading Dashboard...</p>
   </div>
 
-  <div *ngIf="!loading && dashboardStats">
-    <div class="row">
-      <!-- Metric Cards -->
-      <div class="col-md-3">
-        <mat-card class="metric-card">
+  <!-- Error State -->
+  <div *ngIf="!loading && error" class="error-container">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadDashboardStats()">
+      Retry
+    </button>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error && dashboardStats" class="dashboard-content">
+    
+    <!-- Header Section -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1>Admin Dashboard</h1>
+          <p>Welcome back! Here's what's happening with your team.</p>
+        </div>
+        <div class="header-actions">
+          <button mat-icon-button (click)="refreshDashboard()" matTooltip="Refresh Dashboard">
+            <mat-icon>refresh</mat-icon>
+          </button>
+          <button mat-raised-button color="primary" routerLink="/admin/leave-requests">
+            <mat-icon>assignment</mat-icon>
+            Manage Requests
+          </button>
+        </div>
+      </div>
+      <div class="last-updated">
+        Last updated: {{ lastUpdated | date:'medium' }}
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="stats-grid">
+      <mat-card class="stat-card stat-card-blue">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>people</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h3 class="stat-number">{{ dashboardStats.totalEmployees }}</h3>
+            <p class="stat-label">Total Employees</p>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card stat-card-orange">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h3 class="stat-number">{{ dashboardStats.pendingLeaveRequests }}</h3>
+            <p class="stat-label">Pending Requests</p>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card stat-card-green">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h3 class="stat-number">{{ dashboardStats.approvedLeaveRequestsThisMonth }}</h3>
+            <p class="stat-label">Approved This Month</p>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card stat-card-purple">
+        <div class="stat-content">
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-details">
+            <h3 class="stat-number">{{ dashboardStats.approvalRateThisMonth | number:'1.1-1' }}%</h3>
+            <p class="stat-label">Approval Rate</p>
+          </div>
+        </div>
+      </mat-card>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-section">
+      <div class="charts-grid">
+        
+        <!-- Monthly Trends Chart -->
+        <mat-card class="chart-card">
           <mat-card-header>
-            <mat-card-title>Total Employees</mat-card-title>
+            <mat-card-title>Monthly Leave Trends</mat-card-title>
+            <mat-card-subtitle>Last 6 months overview</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <h2>{{ dashboardStats.totalEmployees }}</h2>
+            <div class="chart-container" *ngIf="monthlyTrendsChartData.length > 0">
+              <ngx-charts-bar-vertical-2d>
+                [view]="chartView"
+                [results]="monthlyTrendsChartData"
+                [scheme]="colorScheme"
+                [xAxis]="true"
+                [yAxis]="true"
+                [legend]="true"
+                [showXAxisLabel]="true"
+                [showYAxisLabel]="true"
+                [xAxisLabel]="'Month'"
+                [yAxisLabel]="'Requests'"
+                [animations]="true">
+              </ngx-charts-bar-vertical-2d>
+            </div>
+            <div *ngIf="monthlyTrendsChartData.length === 0" class="no-data">
+              <mat-icon>bar_chart</mat-icon>
+              <p>No trend data available</p>
+            </div>
           </mat-card-content>
         </mat-card>
-      </div>
-      <div class="col-md-3">
-        <mat-card class="metric-card">
+
+        <!-- Leave Types Distribution -->
+        <mat-card class="chart-card">
           <mat-card-header>
-            <mat-card-title>Pending Leaves</mat-card-title>
+            <mat-card-title>Leave Types Distribution</mat-card-title>
+            <mat-card-subtitle>Breakdown by type</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <h2>{{ dashboardStats.pendingLeaves }}</h2>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div class="col-md-3">
-        <mat-card class="metric-card">
-          <mat-card-header>
-            <mat-card-title>Leaves This Month</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <h2>{{ dashboardStats.totalLeavesThisMonth }}</h2>
-          </mat-card-content>
-        </mat-card>
-      </div>
-      <div class="col-md-3">
-        <mat-card class="metric-card">
-          <mat-card-header>
-            <mat-card-title>Approval Rate</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <h2>{{ dashboardStats.leaveApprovalRate | percent:'1.0-0' }}</h2>
+            <div class="chart-container" *ngIf="leaveTypesChartData.length > 0">
+              <ngx-charts-pie-chart
+                [view]="pieChartView"
+                [results]="leaveTypesChartData"
+                [scheme]="colorScheme"
+                [legend]="true"
+                legendPosition='below'
+                [labels]="true"
+                [doughnut]="true"
+                [animations]="true">
+              </ngx-charts-pie-chart>
+            </div>
+            <div *ngIf="leaveTypesChartData.length === 0" class="no-data">
+              <mat-icon>pie_chart</mat-icon>
+              <p>No distribution data available</p>
+            </div>
           </mat-card-content>
         </mat-card>
       </div>
     </div>
 
-    <!-- Chart Section -->
-    <div class="row mt-4">
-      <div class="col-md-12">
-        <mat-card>
+    <!-- Bottom Section: Quick Actions & Recent Activity -->
+    <div class="bottom-section">
+      <div class="bottom-grid">
+        
+        <!-- Quick Actions -->
+        <mat-card class="quick-actions-card">
           <mat-card-header>
-            <mat-card-title>Leave Requests Breakdown (This Month)</mat-card-title>
+            <mat-card-title>Quick Actions</mat-card-title>
+            <mat-card-subtitle>Common admin tasks</mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <div class="chart-container">
-              <ngx-charts-pie-chart
-                [view]="view"
-                [scheme]="colorScheme"
-                [results]="leaveStatsChartData"
-                [gradient]="gradient"
-                [legend]="showLegend"
-                [legendTitle]="'Leave Status'"
-                [legendPosition]="legendPosition"
-                [labels]="showLabels"
-                [doughnut]="isDoughnut"
-                (select)="onChartSelect($event)">
-              </ngx-charts-pie-chart>
+            <div class="quick-actions-grid">
+              
+              <button mat-stroked-button class="quick-action-btn" routerLink="/admin/leave-requests">
+                <mat-icon>assignment</mat-icon>
+                <div class="action-text">
+                  <span class="action-title">Manage Leave Requests</span>
+                  <span class="action-subtitle">Review pending requests</span>
+                </div>
+              </button>
+
+              <button mat-stroked-button class="quick-action-btn" routerLink="/admin/employees">
+                <mat-icon>people</mat-icon>
+                <div class="action-text">
+                  <span class="action-title">Employee Management</span>
+                  <span class="action-subtitle">View and manage employees</span>
+                </div>
+              </button>
+
+              <button mat-stroked-button class="quick-action-btn" (click)="generateReport()">
+                <mat-icon>assessment</mat-icon>
+                <div class="action-text">
+                  <span class="action-title">Generate Reports</span>
+                  <span class="action-subtitle">Create detailed analytics</span>
+                </div>
+              </button>
+
+              <button mat-stroked-button class="quick-action-btn" (click)="openSettings()">
+                <mat-icon>settings</mat-icon>
+                <div class="action-text">
+                  <span class="action-title">System Settings</span>
+                  <span class="action-subtitle">Configure system options</span>
+                </div>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Recent Activity -->
+        <mat-card class="recent-activity-card">
+          <mat-card-header>
+            <mat-card-title>Recent Activity</mat-card-title>
+            <mat-card-subtitle>Latest system events</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="activity-list" *ngIf="dashboardStats.recentActivities.length > 0">
+              <div class="activity-item" *ngFor="let activity of dashboardStats.recentActivities; let i = index" 
+                   [class.activity-divider]="i < dashboardStats.recentActivities.length - 1">
+                
+                <div class="activity-icon" [ngClass]="getActivityIconClass(activity.activityType)">
+                  <mat-icon>{{ getActivityIcon(activity.activityType) }}</mat-icon>
+                </div>
+                
+                <div class="activity-content">
+                  <p class="activity-description">
+                    <strong>{{ activity.employeeName }}</strong> - {{ activity.description }}
+                  </p>
+                  <span class="activity-time">{{ activity.timestamp | date:'short' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div *ngIf="dashboardStats.recentActivities.length === 0" class="no-data">
+              <mat-icon>history</mat-icon>
+              <p>No recent activity</p>
             </div>
           </mat-card-content>
         </mat-card>
       </div>
+    </div>
+
+    <!-- System Health Footer -->
+    <div class="system-health-section">
+      <mat-card class="health-card">
+        <mat-card-header>
+          <mat-card-title>System Health</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="health-indicators">
+            
+            <div class="health-item">
+              <div class="health-status" [class.status-healthy]="dashboardStats.systemHealth.databaseHealthy"
+                   [class.status-unhealthy]="!dashboardStats.systemHealth.databaseHealthy">
+                <mat-icon>{{ dashboardStats.systemHealth.databaseHealthy ? 'check_circle' : 'error' }}</mat-icon>
+              </div>
+              <div class="health-info">
+                <span class="health-label">Database</span>
+                <span class="health-value">{{ dashboardStats.systemHealth.databaseHealthy ? 'Healthy' : 'Error' }}</span>
+              </div>
+            </div>
+
+            <div class="health-item">
+              <div class="health-status" [class.status-healthy]="dashboardStats.systemHealth.apiServicesRunning"
+                   [class.status-unhealthy]="!dashboardStats.systemHealth.apiServicesRunning">
+                <mat-icon>{{ dashboardStats.systemHealth.apiServicesRunning ? 'check_circle' : 'error' }}</mat-icon>
+              </div>
+              <div class="health-info">
+                <span class="health-label">API Services</span>
+                <span class="health-value">{{ dashboardStats.systemHealth.apiServicesRunning ? 'Running' : 'Error' }}</span>
+              </div>
+            </div>
+
+            <div class="health-item">
+              <div class="health-status" [class.status-healthy]="dashboardStats.systemHealth.emailServiceAvailable"
+                   [class.status-warning]="!dashboardStats.systemHealth.emailServiceAvailable">
+                <mat-icon>{{ dashboardStats.systemHealth.emailServiceAvailable ? 'check_circle' : 'warning' }}</mat-icon>
+              </div>
+              <div class="health-info">
+                <span class="health-label">Email Service</span>
+                <span class="health-value">{{ dashboardStats.systemHealth.emailServiceAvailable ? 'Available' : 'Limited' }}</span>
+              </div>
+            </div>
+
+            <div class="health-item">
+              <div class="health-info">
+                <span class="health-label">System Uptime</span>
+                <span class="health-value">{{ formatUptime(dashboardStats.systemHealth.totalSystemUptime) }}</span>
+              </div>
+            </div>
+
+            <div class="health-item">
+              <div class="health-info">
+                <span class="health-label">Last Backup</span>
+                <span class="health-value">{{ dashboardStats.systemHealth.lastBackupTime }}</span>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
   </div>
 </div>
