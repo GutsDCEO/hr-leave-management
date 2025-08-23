@@ -4,18 +4,20 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, ToastComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -36,11 +38,13 @@ export class LoginComponent {
   onSubmit(): void {
     if (this.loginForm.invalid) return;
 
+    this.isLoading = true;
     const { email, password } = this.loginForm.value;
+    
     this.authService.login(email, password).subscribe({
       next: () => {
+        this.isLoading = false;
         // Get role from AuthService
-        // ✅ Get role from AuthService
         const role = this.authService.currentRole;
         if (role) {
           this.redirectBasedOnRole(role);
@@ -48,8 +52,10 @@ export class LoginComponent {
           this.toast.showError('Invalid role');
         }
       },
-      error: () => {
-        this.toast.showError('Login failed');
+      error: (error) => {
+        this.isLoading = false;
+        console.error('Login error:', error);
+        this.toast.showError(error?.error?.message || 'Login failed. Please check your credentials.');
       }
     });
   }
@@ -62,7 +68,6 @@ export class LoginComponent {
       case 'EMPLOYEE':
         this.router.navigate(['/employee']);
         break;
-
       default:
         this.toast.showError('Unauthorized role');
         this.router.navigate(['/unauthorized']);

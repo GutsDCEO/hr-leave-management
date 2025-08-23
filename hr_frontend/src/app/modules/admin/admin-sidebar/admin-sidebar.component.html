@@ -1,1 +1,64 @@
-<p>admin-sidebar works!</p>
+<div class="admin-sidebar">
+  <div class="sidebar-header">
+    <div class="logo-section">
+      <i class="fas fa-shield-alt"></i>
+      <span class="logo-text">Admin Panel</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/admin" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a routerLink="/admin/leave-requests" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-calendar-check"></i>
+          <span>Leave Requests</span>
+          <span class="badge" *ngIf="pendingCount > 0">{{ pendingCount }}</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a routerLink="/admin/employees" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-users"></i>
+          <span>Employees</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a routerLink="/admin/reports" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-chart-bar"></i>
+          <span>Reports</span>
+        </a>
+      </li>
+      
+      <li class="nav-item">
+        <a routerLink="/admin/settings" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-cog"></i>
+          <span>Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-info">
+      <div class="user-avatar">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <div class="user-details">
+        <span class="user-name">Admin User</span>
+        <span class="user-role">Administrator</span>
+      </div>
+    </div>
+    <button class="logout-btn" (click)="logout()">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </button>
+  </div>
+</div>

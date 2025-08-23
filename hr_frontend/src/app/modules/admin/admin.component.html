@@ -1,4 +1,152 @@
-<div class="admin">
-  <h1>Welcome to the Admin Home</h1>
-  <p>Use the navigation bar to manage users, view reports, and access admin features.</p>
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">
+        <i class="fas fa-tachometer-alt"></i>
+        Admin Dashboard
+      </h1>
+      <p class="dashboard-subtitle">Manage your HR platform and monitor employee activities</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="refreshDashboard()" [disabled]="isLoading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-number">{{ totalEmployees || 0 }}</h3>
+        <p class="stat-label">Total Employees</p>
+      </div>
+      <div class="stat-trend positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>+12%</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-number">{{ pendingRequests || 0 }}</h3>
+        <p class="stat-label">Pending Requests</p>
+      </div>
+      <div class="stat-trend warning">
+        <i class="fas fa-clock"></i>
+        <span>Needs Attention</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-number">{{ approvedRequests || 0 }}</h3>
+        <p class="stat-label">Approved This Month</p>
+      </div>
+      <div class="stat-trend positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>+8%</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-chart-line"></i>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-number">{{ attendanceRate || 95 }}%</h3>
+        <p class="stat-label">Attendance Rate</p>
+      </div>
+      <div class="stat-trend positive">
+        <i class="fas fa-arrow-up"></i>
+        <span>+2%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions-section">
+    <h2 class="section-title">
+      <i class="fas fa-bolt"></i>
+      Quick Actions
+    </h2>
+    <div class="actions-grid">
+      <button class="action-card" (click)="navigateToLeaveManagement()">
+        <div class="action-icon">
+          <i class="fas fa-calendar-alt"></i>
+        </div>
+        <h3>Manage Leave Requests</h3>
+        <p>Review and approve employee leave requests</p>
+      </button>
+
+      <button class="action-card" (click)="navigateToEmployeeDirectory()">
+        <div class="action-icon">
+          <i class="fas fa-user-friends"></i>
+        </div>
+        <h3>Employee Directory</h3>
+        <p>View and manage employee information</p>
+      </button>
+
+      <button class="action-card" (click)="navigateToReports()">
+        <div class="action-icon">
+          <i class="fas fa-chart-bar"></i>
+        </div>
+        <h3>Reports & Analytics</h3>
+        <p>Generate reports and view analytics</p>
+      </button>
+
+      <button class="action-card" (click)="navigateToSettings()">
+        <div class="action-icon">
+          <i class="fas fa-cog"></i>
+        </div>
+        <h3>System Settings</h3>
+        <p>Configure system preferences and policies</p>
+      </button>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="recent-activity-section">
+    <h2 class="section-title">
+      <i class="fas fa-history"></i>
+      Recent Activity
+    </h2>
+    <div class="activity-list">
+      <div class="activity-item" *ngFor="let activity of recentActivities">
+        <div class="activity-icon" [ngClass]="activity.type">
+          <i [class]="activity.icon"></i>
+        </div>
+        <div class="activity-content">
+          <p class="activity-text">{{ activity.message }}</p>
+          <span class="activity-time">{{ activity.time }}</span>
+        </div>
+      </div>
+      <div class="activity-item empty" *ngIf="recentActivities.length === 0">
+        <div class="activity-icon">
+          <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="activity-content">
+          <p class="activity-text">No recent activity</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Backend Connection Status -->
+    <div class="connection-status" *ngIf="pendingRequests === 0 && !isLoading">
+      <div class="status-warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Backend service may be unavailable. Some data might not be current.</span>
+      </div>
+    </div>
+  </div>
 </div>

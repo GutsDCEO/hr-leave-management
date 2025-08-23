@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { LeaveRequestsService, LeaveRequest } from '../../../core/services/leave-requests.service';
+import { ToastService } from '../../../shared/components/toast/toast.service';
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-leave-requests-management',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ToastComponent],
   templateUrl: './leave-requests-management.component.html',
   styleUrls: ['./leave-requests-management.component.css']
 })
@@ -17,7 +19,10 @@ export class LeaveRequestsManagementComponent implements OnInit {
   loading = false;
   actionInProgress = false;
 
-  constructor(private leaveService: LeaveRequestsService) {}
+  constructor(
+    private leaveService: LeaveRequestsService,
+    private toast: ToastService
+  ) {}
 
   ngOnInit() {
     this.loadLeaves();
@@ -44,6 +49,7 @@ export class LeaveRequestsManagementComponent implements OnInit {
       error: (error) => {
         console.error('Error loading leave requests', error);
         this.loading = false;
+        this.toast.showError('Failed to load leave requests. Please try again.');
       }
     });
   }
@@ -70,12 +76,13 @@ export class LeaveRequestsManagementComponent implements OnInit {
           this.leaves[index].status = 'APPROVED';
         }
         this.actionInProgress = false;
+        this.toast.showSuccess('Leave request approved successfully!');
         console.log('Leave request approved successfully');
       },
       error: (error) => {
         console.error('Error approving leave request', error);
         this.actionInProgress = false;
-        // Optionally show an error notification here
+        this.toast.showError('Failed to approve leave request. Please try again.');
       }
     });
   }
@@ -93,12 +100,13 @@ export class LeaveRequestsManagementComponent implements OnInit {
           this.leaves[index].status = 'REJECTED';
         }
         this.actionInProgress = false;
+        this.toast.showSuccess('Leave request rejected successfully!');
         console.log('Leave request rejected successfully');
       },
       error: (error) => {
         console.error('Error rejecting leave request', error);
         this.actionInProgress = false;
-        // Optionally show an error notification here
+        this.toast.showError('Failed to reject leave request. Please try again.');
       }
     });
   }

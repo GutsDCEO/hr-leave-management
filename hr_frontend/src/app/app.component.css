@@ -38,3 +38,118 @@
     padding: 8px;
     cursor: pointer;
   }
+
+  /* Modern Footer Styling */
+  .app-footer {
+    background: var(--white);
+    border-top: 1px solid var(--gray-200);
+    padding: 1.5rem 0;
+    margin-top: auto;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-section {
+    display: flex;
+    align-items: center;
+  }
+
+  .copyright {
+    color: var(--gray-600);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin: 0;
+    font-family: var(--font-family);
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .footer-link {
+    color: var(--gray-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    padding: 0.25rem 0;
+    position: relative;
+  }
+
+  .footer-link:hover {
+    color: var(--primary-600);
+    transform: translateY(-1px);
+  }
+
+  .footer-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-600);
+    transition: width 0.2s ease;
+  }
+
+  .footer-link:hover::after {
+    width: 100%;
+  }
+
+  /* Responsive Footer */
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+    }
+
+    .footer-links {
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .copyright {
+      font-size: 0.8rem;
+    }
+
+    .footer-link {
+      font-size: 0.8rem;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .app-footer {
+      background: var(--gray-900);
+      border-top-color: var(--gray-700);
+    }
+
+    .copyright {
+      color: var(--gray-400);
+    }
+
+    .footer-link {
+      color: var(--gray-400);
+    }
+
+    .footer-link:hover {
+      color: var(--primary-400);
+    }
+
+    .footer-link::after {
+      background: var(--primary-400);
+    }
+  }

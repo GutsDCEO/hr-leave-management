@@ -7,6 +7,7 @@ import { NoAuthGuard } from './core/guards/no_auth.guards';
 import { LeaveRequestsManagementComponent } from './modules/admin/leave-requests-management/leave-requests-management.component';
 import { EmployeeLeaveRequestsComponent } from './modules/employee/components/leave-requests/leave-requests.component';
 import { AuthGuard } from './core/guards/auth.guards';
+import { HrAssistantPageComponent } from './shared/components/hr-assistant/hr-assistant-page.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -16,5 +17,10 @@ export const routes: Routes = [
     { path: 'employee', component: EmployeeComponent },
     { path: 'admin/leave-requests', component: LeaveRequestsManagementComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
     { path: 'employee/leave-requests', component: EmployeeLeaveRequestsComponent, canActivate: [AuthGuard], data: { role: 'EMPLOYEE' }},
+    { 
+        path: 'hr-assistant', 
+        component: HrAssistantPageComponent,
+        canActivate: [AuthGuard]
+    },
     { path: '**', redirectTo: 'login' } // Fallback route
 ];

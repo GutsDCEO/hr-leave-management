@@ -746,4 +746,27 @@ export class LeaveRequestFormComponent implements OnInit {
       }
     }, 0);
   }
+
+  // Method required by LeaveFormGuard for CanDeactivate
+  confirmLeave(): Observable<boolean> {
+    // If form is not dirty, allow navigation
+    if (!this.leaveForm?.dirty) {
+      return of(true);
+    }
+
+    // Show confirmation dialog for unsaved changes
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Unsaved Changes',
+        message: 'You have unsaved changes. Are you sure you want to leave this page?',
+        confirmText: 'Leave',
+        cancelText: 'Stay',
+        warn: true
+      },
+      disableClose: true
+    });
+
+    return dialogRef.afterClosed();
+  }
 }

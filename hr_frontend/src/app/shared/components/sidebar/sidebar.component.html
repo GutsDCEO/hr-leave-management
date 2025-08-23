@@ -1,40 +1,60 @@
 <div id="viewport">
   <!-- Sidebar -->
   <div id="sidebar">
-    <ul class="table">
-    
-      <li *ngIf="currentRole === 'ADMIN'">
-        <a href="#">
-          <i class="zmdi zmdi-view-dashboard"></i> Dashboard
+    <nav class="sidebar-nav">
+      <ul  class="sidebar-menu">
+        <!-- Admin Links -->
+        <ng-container *ngIf="currentRole === 'ADMIN'">
+          <li>
+            <a class="menu-item" [routerLink]="['/admin/dashboard']" routerLinkActive="active">
+              <mat-icon>dashboard</mat-icon>
+              <span class="menu-text" style="color: aliceblue;">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a class="menu-item" [routerLink]="['/admin/employees']" routerLinkActive="active">
+              <mat-icon>people</mat-icon>
+              <span class="menu-text" style="color: aliceblue;">Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="menu-item" [routerLink]="['/admin/leave-requests']" routerLinkActive="active">
+              <mat-icon>assignment</mat-icon>
+              <span class="menu-text" style="color: aliceblue;" >Leave Requests</span>
+            </a>
+          </li>
+        </ng-container>
+
+        <!-- HR Links -->
+        <ng-container *ngIf="currentRole === 'HR'">
+          <li>
+            <a class="menu-item" [routerLink]="['/hr/dashboard']" routerLinkActive="active">
+              <mat-icon>dashboard</mat-icon>
+              <span class="menu-text" style="color: aliceblue;">Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a class="menu-item" [routerLink]="['/hr/employees']" routerLinkActive="active">
+              <mat-icon>people</mat-icon>
+              <span class="menu-text" style="color: aliceblue;">Employees</span>
+            </a>
+          </li>
+          <li>
+            <a class="menu-item" [routerLink]="['/hr/leave-requests']" routerLinkActive="active">
+              <mat-icon>assignment</mat-icon>
+              <span class="menu-text" style="color: aliceblue;">Leave Requests</span>
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+
+      <!-- Common Links -->
+      <div class="sidebar-footer">
+        <a class="menu-item" (click)="authService.logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span class="menu-text" style="color: aliceblue;">Logout</span>
         </a>
-      </li>
-      <li *ngIf="currentRole === 'EMPLOYEE'">
-        <a href="#">
-          <i class="zmdi zmdi-calendar-account"></i> My Leave
-        </a>
-      </li>
-      <li *ngIf="currentRole === 'ADMIN'">
-        <a [routerLink]="['/admin/leave-requests']">
-          <i class="zmdi zmdi-widgets"></i> Services
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <i class="zmdi zmdi-calendar"></i> Events
-        </a>
-      </li>
-      <li>
-        <a href="#">
-          <i class="zmdi zmdi-info-outline"></i> About
-        </a>
-      </li>
-      
-      <li>
-        <a href="#">
-          <i class="zmdi zmdi-comment-more"></i> Contact
-        </a>
-      </li>
-    </ul>
+      </div>
+    </nav>
   </div>
-  
 </div>

@@ -1,0 +1,88 @@
+<div class="hr-assistant-container">
+  <!-- Header -->
+  <mat-toolbar color="primary" class="chat-header">
+    <mat-icon class="mr-2">support_agent</mat-icon>
+    <span>HR Assistant</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="clearChat()" matTooltip="Clear Chat">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <!-- Quick Actions -->
+  <div class="quick-actions p-4 bg-gray-50 border-b">
+    <div class="flex flex-wrap gap-2">
+      <button mat-stroked-button color="primary" (click)="askAboutVacationBalance()" class="quick-action-btn">
+        <mat-icon>calendar_today</mat-icon>
+        Vacation Balance
+      </button>
+      <button mat-stroked-button color="primary" (click)="askAboutLeaveRequest()" class="quick-action-btn">
+        <mat-icon>add_task</mat-icon>
+        Submit Leave
+      </button>
+      <button mat-stroked-button color="primary" (click)="askAboutSickLeave()" class="quick-action-btn">
+        <mat-icon>local_hospital</mat-icon>
+        Sick Leave Policy
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <div #chatContainer class="chat-messages" [class.loading]="isLoading">
+    <div *ngFor="let message of messages; trackBy: trackByMessageId" 
+         class="message-wrapper"
+         [class.user-message]="message.isUser"
+         [class.ai-message]="!message.isUser">
+      
+      <div class="message-bubble" [class.typing]="message.isTyping">
+        <div class="message-avatar">
+          <mat-icon *ngIf="message.isUser" class="user-avatar">person</mat-icon>
+          <mat-icon *ngIf="!message.isUser" class="ai-avatar">smart_toy</mat-icon>
+        </div>
+        
+        <div class="message-content">
+          <div class="message-text" [innerHTML]="formatMessage(message.content)"></div>
+          <div class="message-time">{{ getMessageTime(message.timestamp) }}</div>
+          
+          <!-- Typing indicator -->
+          <div *ngIf="message.isTyping" class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input Area -->
+  <div class="chat-input-area">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Ask me anything about HR policies...</mat-label>
+      <textarea 
+        #messageInput
+        matInput 
+        [(ngModel)]="currentMessage"
+        (keydown)="onKeyPress($event)"
+        [disabled]="isLoading"
+        rows="2"
+        placeholder="e.g., 'What's my vacation balance?' or 'How do I request sick leave?'">
+      </textarea>
+      <button 
+        mat-icon-button 
+        matSuffix 
+        (click)="sendMessage()"
+        [disabled]="!currentMessage.trim() || isLoading"
+        color="primary">
+        <mat-icon *ngIf="!isLoading">send</mat-icon>
+        <mat-spinner *ngIf="isLoading" diameter="20"></mat-spinner>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <!-- Help Text -->
+  <div class="help-text p-2 text-center text-sm text-gray-500">
+    💡 I can help with leave policies, balances, and HR questions. For complex issues, contact 
+    <a href="mailto:hr@company.com" class="text-blue-600">hr@company.com</a>
+  </div>
+</div>

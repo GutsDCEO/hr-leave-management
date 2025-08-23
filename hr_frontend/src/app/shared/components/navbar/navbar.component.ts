@@ -3,7 +3,9 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { getPermissionsForRoles, RolePermissions } from '../../../shared/utils/role.utils';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { HrAssistantDialogComponent } from '../hr-assistant-dialog/hr-assistant-dialog.component';
 
 @Component({
     selector: 'app-navbar',
@@ -15,15 +17,26 @@ import { RouterModule } from '@angular/router';
 })
 export class NavbarComponent {
     permissions: RolePermissions;
-    router: any;
 
-    constructor(public authService: AuthService) {
+    constructor(
+        public authService: AuthService,
+        private router: Router,
+        private dialog: MatDialog
+    ) {
         this.permissions = getPermissionsForRoles(this.authService.currentRole);
-        
     }
 
     navigateToLogin() {
         this.router.navigate(['/login']);
-    }   
+    }
 
+    openHRAssistant() {
+        this.dialog.open(HrAssistantDialogComponent, {
+            width: '800px',
+            height: '600px',
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            panelClass: 'hr-assistant-dialog'
+        });
+    }
 }

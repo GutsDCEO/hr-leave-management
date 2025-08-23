@@ -9,6 +9,11 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="#">Home</a>
           </li>
+          <li class="nav-item" *ngIf="authService.isLoggedIn">
+            <a class="nav-link" [routerLink]="['/hr-assistant']" title="HR Assistant">
+              <i class="fas fa-robot"></i> HR Assistant
+            </a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" *ngIf="!authService.isLoggedIn" (click)="navigateToLogin()" href="#" >Login</a>
           </li>
