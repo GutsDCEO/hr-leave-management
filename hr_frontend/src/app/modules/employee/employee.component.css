@@ -189,12 +189,12 @@ mat-card-content {
   .employee-dashboard {
     padding: 1rem;
   }
-  
-  .mat-mdc-cell, 
+
+  .mat-mdc-cell,
   .mat-mdc-header-cell {
     padding: 0 8px !important;
   }
-  
+
   .action-menu {
     justify-content: center;
   }

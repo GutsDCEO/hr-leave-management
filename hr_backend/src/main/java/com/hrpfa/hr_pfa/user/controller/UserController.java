@@ -2,18 +2,22 @@ package com.hrpfa.hr_pfa.user.controller;
 
 import com.hrpfa.hr_pfa.exceptions.UserAlreadyExistsException;
 import com.hrpfa.hr_pfa.user.dto.UserDTO;
+import com.hrpfa.hr_pfa.user.dto.UserProfileDTO;
 import com.hrpfa.hr_pfa.user.dto.UserRoleUpdateDTO;
 import com.hrpfa.hr_pfa.user.model.User;
 import com.hrpfa.hr_pfa.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import com.hrpfa.hr_pfa.config.SecurityConfig;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -22,6 +26,44 @@ public class UserController {
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+
+    @GetMapping("/profile")
+    public ResponseEntity<UserProfileDTO> getCurrentUserProfile() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        return ResponseEntity.ok(convertToProfileDTO(userOpt.get()));
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateProfile(@Valid @RequestBody UserProfileDTO profileDTO) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        
+        User user = userOpt.get();
+        // Only allow updating certain fields
+        user.setFirstName(profileDTO.getFirstName());
+        user.setLastName(profileDTO.getLastName());
+        user.setPhone(profileDTO.getPhone());
+        
+        try {
+            User updatedUser = userService.updateUser(user);
+            return ResponseEntity.ok(convertToProfileDTO(updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update profile: " + e.getMessage());
+        }
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -77,6 +119,16 @@ public class UserController {
                 .id(user.getId())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .build();
+    }
+
+    private UserProfileDTO convertToProfileDTO(User user) {
+        return UserProfileDTO.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .phone(user.getPhone())
                 .build();
     }
 }

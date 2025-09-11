@@ -66,12 +66,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [
-    LeaveManagementComponent,
-    LeaveListComponent,
-    LeaveRequestFormComponent,
-    LeaveDetailComponent
-  ],
+  declarations: [],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -88,7 +83,11 @@ const routes: Routes = [
     MatNativeDateModule,
     MatSelectModule,
     MatMenuModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    // Standalone Components
+    LeaveManagementComponent,
+    LeaveRequestFormComponent,
+    LeaveDetailComponent
   ],
   providers: [
     LeaveResolver,

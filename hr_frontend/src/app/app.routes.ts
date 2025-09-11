@@ -8,6 +8,8 @@ import { LeaveRequestsManagementComponent } from './modules/admin/leave-requests
 import { EmployeeLeaveRequestsComponent } from './modules/employee/components/leave-requests/leave-requests.component';
 import { AuthGuard } from './core/guards/auth.guards';
 import { HrAssistantPageComponent } from './shared/components/hr-assistant/hr-assistant-page.component';
+import { LeaveListComponent } from './modules/leave/leave-list/leave-list.component';
+import { ProfileComponent } from './modules/employee/components/profile/profile.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -17,6 +19,8 @@ export const routes: Routes = [
     { path: 'employee', component: EmployeeComponent },
     { path: 'admin/leave-requests', component: LeaveRequestsManagementComponent, canActivate: [AuthGuard], data: { role: 'ADMIN' }},
     { path: 'employee/leave-requests', component: EmployeeLeaveRequestsComponent, canActivate: [AuthGuard], data: { role: 'EMPLOYEE' }},
+    { path: 'employee/profile', component: ProfileComponent, canActivate: [AuthGuard], data: { role: 'EMPLOYEE' }},
+    { path: 'employee/leaves', component: LeaveListComponent, canActivate: [AuthGuard], data: { role: 'EMPLOYEE' }},
     { 
         path: 'hr-assistant', 
         component: HrAssistantPageComponent,

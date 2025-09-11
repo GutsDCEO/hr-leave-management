@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { EmployeeComponent } from './employee.component';
 import { AuthGuard } from '../../core/guards/auth.guards';
 import { RoleGuard } from '../../core/guards/role.guards';
+import { ProfileComponent } from './components/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -23,7 +24,8 @@ const routes: Routes = [
       {
         path: 'leaves',
         loadChildren: () => import('../leave/leave.module').then(m => m.LeaveModule)
-      }
+      },
+      // Profile route moved to app.routes.ts
     ]
   }
 ];

@@ -12,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { LeaveRequestFormComponent } from '../leave/leave-request-form/leave-request-form.component';
 import { LeaveService } from '../leave/shared/leave.service';
 import { LeaveBalance, LeaveRequest, LeaveStatus, LeaveType } from '../leave/models/leave.model';
+import { EmployeeSidebarComponent } from './employee-sidebar/employee-sidebar.component';
 
 interface LeaveBalanceDisplay extends LeaveBalance {
   remainingDays: number;
@@ -23,14 +24,14 @@ interface LeaveBalanceDisplay extends LeaveBalance {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     RouterOutlet,
     MatCardModule,
     MatButtonModule,
     MatTableModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatMenuModule // For mat-menu and matMenuTriggerFor
+    MatMenuModule,
+    EmployeeSidebarComponent
   ],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css']

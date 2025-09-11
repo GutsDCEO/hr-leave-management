@@ -114,6 +114,15 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    @Transactional
+    public User updateUser(User user) {
+        if (!userRepository.existsById(user.getId())) {
+            throw new UserNotFoundException("User not found with id: " + user.getId());
+        }
+        return userRepository.save(user);
+    }
+
     // Helper method for role validation
     private boolean isValidRole(String role) {
         return role != null &&

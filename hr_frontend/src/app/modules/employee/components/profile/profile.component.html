@@ -1,11 +1,183 @@
 <div class="profile-container">
-  <div class="page-header">
-    <h2><i class="zmdi zmdi-account"></i> My Profile</h2>
-    <p>View and update your personal information</p>
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <mat-spinner></mat-spinner>
+    <p>Loading profile...</p>
   </div>
-  <div class="card">
-    <div class="card-body">
-      <p>Profile details feature coming soon.</p>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <mat-icon color="warn">error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="loadProfile()">Retry</button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!loading && !error">
+    <mat-card class="profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-wrapper">
+          <img [src]="avatarUrl" alt="Profile picture" class="avatar-image">
+          <button mat-mini-fab color="primary" class="avatar-upload-btn">
+            <mat-icon>photo_camera</mat-icon>
+            <input type="file" (change)="onAvatarChange($event)" accept="image/*">
+          </button>
+        </div>
+      </div>
+    <div class="profile-info">
+      <h1>{{ profileForm.get('firstName')?.value }} {{ profileForm.get('lastName')?.value }}</h1>
+      <p class="subtitle">{{ profileForm.get('position')?.value }} - {{ profileForm.get('department')?.value }}</p>
+      <p class="employee-id">Employee ID: {{ profileForm.get('employeeId')?.value }}</p>
     </div>
-  </div>
+  </mat-card>
+
+  <mat-card class="profile-content">
+    <mat-tab-group>
+      <!-- Personal Information Tab -->
+      <mat-tab label="Personal Information">
+        <form [formGroup]="profileForm" (ngSubmit)="onProfileSubmit()" class="profile-form">
+          <div class="form-header">
+            <h2>Personal Information</h2>
+            <button mat-button color="primary" type="button" (click)="toggleEdit()">
+              <mat-icon>{{ isEditing ? 'close' : 'edit' }}</mat-icon>
+              {{ isEditing ? 'Cancel' : 'Edit' }}
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <mat-form-field appearance="outline">
+              <mat-label>First Name</mat-label>
+              <input matInput formControlName="firstName" [readonly]="!isEditing">
+              <mat-error *ngIf="profileForm.get('firstName')?.hasError('required')">
+                First name is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Last Name</mat-label>
+              <input matInput formControlName="lastName" [readonly]="!isEditing">
+              <mat-error *ngIf="profileForm.get('lastName')?.hasError('required')">
+                Last name is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Email</mat-label>
+              <input matInput formControlName="email" [readonly]="!isEditing">
+              <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+                Email is required
+              </mat-error>
+              <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                Please enter a valid email
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Phone</mat-label>
+              <input matInput formControlName="phone" [readonly]="!isEditing">
+              <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">
+                Please enter a valid 10-digit phone number
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Department</mat-label>
+              <input matInput formControlName="department" [readonly]="!isEditing">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Position</mat-label>
+              <input matInput formControlName="position" [readonly]="!isEditing">
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions" *ngIf="isEditing">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!profileForm.valid">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </mat-tab>
+
+      <!-- Security Tab -->
+      <mat-tab label="Security">
+        <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="password-form">
+          <h2>Change Password</h2>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Current Password</mat-label>
+            <input matInput type="password" formControlName="currentPassword">
+            <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
+              Current password is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>New Password</mat-label>
+            <input matInput type="password" formControlName="newPassword">
+            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+              New password is required
+            </mat-error>
+            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+              Password must be at least 8 characters long
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirm New Password</mat-label>
+            <input matInput type="password" formControlName="confirmPassword">
+            <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+              Please confirm your new password
+            </mat-error>
+            <mat-error *ngIf="passwordForm.hasError('passwordMismatch')">
+              Passwords do not match
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!passwordForm.valid">
+              Change Password
+            </button>
+          </div>
+        </form>
+      </mat-tab>
+
+      <!-- Preferences Tab -->
+      <mat-tab label="Preferences">
+        <form [formGroup]="preferencesForm" (ngSubmit)="onPreferencesSubmit()" class="preferences-form">
+          <h2>User Preferences</h2>
+
+          <div class="form-field">
+            <mat-slide-toggle formControlName="emailNotifications">
+              Email Notifications
+            </mat-slide-toggle>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Language</mat-label>
+            <mat-select formControlName="language">
+              <mat-option value="en">English</mat-option>
+              <mat-option value="fr">French</mat-option>
+              <mat-option value="es">Spanish</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Theme</mat-label>
+            <mat-select formControlName="theme">
+              <mat-option value="light">Light</mat-option>
+              <mat-option value="dark">Dark</mat-option>
+              <mat-option value="system">System</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit" [disabled]="!preferencesForm.valid">
+              Save Preferences
+            </button>
+          </div>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
 </div>

@@ -48,10 +48,13 @@ public class SecurityConfig {
                                 "/api/test/**"  // Allow test endpoints
                                 )
                                 .permitAll()
+                                // Profile endpoints accessible by both ADMIN and EMPLOYEE (GET and PUT)
+                                .requestMatchers(HttpMethod.GET, "/api/user/profile/**").hasAnyRole("ADMIN", "EMPLOYEE")
+                                .requestMatchers(HttpMethod.PUT, "/api/user/profile/**").hasAnyRole("ADMIN", "EMPLOYEE")
                                 // Employees and Admins can view leave requests (GET)
                                 .requestMatchers(HttpMethod.GET, "/api/leaves/**").hasAnyRole("ADMIN", "EMPLOYEE")
                         // Role-based access (Open/Closed: Add new roles without modifying this)
-                                .requestMatchers("/api/user/**").hasRole("ADMIN") // Ensure roles match
+                                .requestMatchers("/api/user/**").hasRole("ADMIN") // Admin access for other user endpoints
                                 // Allow employees to access their own leave endpoints
                                 .requestMatchers(HttpMethod.GET, "/api/employee/leaves/**").hasAnyRole("EMPLOYEE", "ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/api/employee/leaves").hasAnyRole("EMPLOYEE", "ADMIN")

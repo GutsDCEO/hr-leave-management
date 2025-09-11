@@ -10,6 +10,7 @@ public interface UserService {
     User createUser(User user);
     User registerUser(RegisterUserDTO registerUserDTO);
     User updateUserRole(Long userId, String newRole);
+    User updateUser(User user);
     List<User> getAllUsers();
     Optional<User> getUserById(Long id);
     Optional<User> getUserByEmail(String email);
