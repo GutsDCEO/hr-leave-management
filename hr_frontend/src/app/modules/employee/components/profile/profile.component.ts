@@ -98,7 +98,7 @@ export class ProfileComponent implements OnInit {
     const newPassword = group.get('newPassword');
     const confirmPassword = group.get('confirmPassword');
     return newPassword && confirmPassword && newPassword.value === confirmPassword.value
-      ? null 
+      ? null
       : { passwordMismatch: true };
   }
 
@@ -113,8 +113,7 @@ export class ProfileComponent implements OnInit {
           email: profile.email || '',
           phone: profile.phone || '',
           department: profile.department || '',
-          position: profile.position || '',
-          employeeId: profile.employeeId || ''
+          position: profile.position || ''
         });
         this.avatarUrl = profile.avatarUrl || this.avatarUrl;
         if (profile.preferences) {

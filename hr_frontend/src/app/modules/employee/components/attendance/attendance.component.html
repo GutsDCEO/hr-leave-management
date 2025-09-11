@@ -1,0 +1,112 @@
+<div class="attendance-container">
+    <!-- Header Section -->
+    <div class="attendance-header">
+        <h2 class="page-title">
+            <i class="icon-clock"></i>
+            Attendance Management
+        </h2>
+        <p class="page-subtitle">Track your daily attendance and view your history</p>
+    </div>
+
+    <!-- Status Message -->
+    <div *ngIf="statusMessage" class="status-message"
+        [ngClass]="{'success': statusType === 'success', 'error': statusType === 'error'}">
+        <i class="status-icon"
+            [ngClass]="{'icon-check': statusType === 'success', 'icon-alert': statusType === 'error'}"></i>
+        {{ statusMessage }}
+    </div>
+
+    <!-- Clock In/Out Section -->
+    <div class="clock-section">
+        <div class="clock-card">
+            <div class="current-status">
+                <div class="status-indicator" [ngClass]="{'clocked-in': isClockedIn, 'clocked-out': !isClockedIn}">
+                    <i class="status-icon"
+                        [ngClass]="{'icon-clock-in': isClockedIn, 'icon-clock-out': !isClockedIn}"></i>
+                </div>
+                <div class="status-text">
+                    <h3>{{ isClockedIn ? 'Clocked In' : 'Ready to Clock In' }}</h3>
+                    <p>{{ isClockedIn ? 'You are currently working' : 'Start your workday' }}</p>
+                </div>
+            </div>
+
+            <div class="clock-actions">
+                <button class="btn btn-primary" [class.btn-clock-in]="!isClockedIn" [class.btn-clock-out]="isClockedIn"
+                    [disabled]="isLoading" (click)="isClockedIn ? clockOut() : clockIn()">
+                    <i class="btn-icon" [ngClass]="{'icon-play': !isClockedIn, 'icon-stop': isClockedIn}"></i>
+                    <span *ngIf="!isLoading">{{ isClockedIn ? 'Clock Out' : 'Clock In' }}</span>
+                    <span *ngIf="isLoading" class="loading-text">
+                        <i class="icon-spinner spin"></i>
+                        Processing...
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance History Section -->
+    <div class="history-section">
+        <div class="section-header">
+            <h3>Attendance History</h3>
+            <button class="btn btn-secondary btn-sm" (click)="loadAttendanceHistory()" [disabled]="isLoadingHistory">
+                <i class="icon-refresh" [ngClass]="{'spin': isLoadingHistory}"></i>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoadingHistory" class="loading-container">
+            <div class="loading-spinner">
+                <i class="icon-spinner spin"></i>
+            </div>
+            <p>Loading attendance history...</p>
+        </div>
+
+        <!-- Attendance Records -->
+        <div *ngIf="!isLoadingHistory" class="attendance-table-container">
+            <div *ngIf="attendanceRecords.length === 0" class="empty-state">
+                <i class="icon-calendar"></i>
+                <h4>No Attendance Records</h4>
+                <p>Your attendance history will appear here once you start clocking in.</p>
+            </div>
+
+            <div *ngIf="attendanceRecords.length > 0" class="attendance-table">
+                <div class="table-header">
+                    <div class="header-cell date">Date</div>
+                    <div class="header-cell time">Clock In</div>
+                    <div class="header-cell time">Clock Out</div>
+                    <div class="header-cell status">Status</div>
+                </div>
+
+                <div class="table-body">
+                    <div *ngFor="let record of attendanceRecords" class="table-row">
+                        <div class="table-cell date">
+                            {{ record.attendanceDate | date }}
+                        </div>
+
+                        <div class="table-cell time">
+                            {{ record.clockIn | date:'short' }}
+                        </div>
+
+                        <div class="table-cell time">
+                            <span *ngIf="record.clockOut">{{ record.clockOut | date:'short' }}</span>
+                            <span *ngIf="!record.clockOut" class="ongoing-indicator">
+                                <i class="icon-clock"></i>
+                                Ongoing
+                            </span>
+                        </div>
+
+                        <div class="table-cell status">
+                            <span class="status-badge"
+                                [ngClass]="{'complete': record.clockOut, 'ongoing': !record.clockOut}">
+                                <i class="badge-icon"
+                                    [ngClass]="{'icon-check': record.clockOut, 'icon-clock': !record.clockOut}"></i>
+                                {{ record.clockOut ? 'Complete' : 'Ongoing' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -51,10 +51,13 @@ public class UserController {
         }
         
         User user = userOpt.get();
-        // Only allow updating certain fields
+        // Update all fields from the DTO, including the new ones
         user.setFirstName(profileDTO.getFirstName());
         user.setLastName(profileDTO.getLastName());
         user.setPhone(profileDTO.getPhone());
+        user.setDepartment(profileDTO.getDepartment());
+        user.setPosition(profileDTO.getPosition());
+        user.setAvatarUrl(profileDTO.getAvatarUrl());
         
         try {
             User updatedUser = userService.updateUser(user);
@@ -129,6 +132,9 @@ public class UserController {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phone(user.getPhone())
+                .department(user.getDepartment())
+                .position(user.getPosition())
+                .avatarUrl(user.getAvatarUrl())
                 .build();
     }
 }

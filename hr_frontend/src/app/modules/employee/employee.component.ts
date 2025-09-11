@@ -30,9 +30,8 @@ interface LeaveBalanceDisplay extends LeaveBalance {
     MatTableModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatMenuModule,
-    EmployeeSidebarComponent
-  ],
+    MatMenuModule
+],
   templateUrl: './employee.component.html',
   styleUrls: ['./employee.component.css']
 })

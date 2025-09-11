@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -31,7 +32,14 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String role;
 
+    // New fields to align with frontend DTO
+    private String department;
+    private String position;
+    private String employeeId;
+    private String avatarUrl;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserPreference> preferences;
 
 
     @Override

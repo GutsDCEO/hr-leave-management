@@ -1,0 +1,571 @@
+// Variables
+$primary-color: #2563eb;
+$primary-hover: #1d4ed8;
+$success-color: #059669;
+$error-color: #dc2626;
+$warning-color: #d97706;
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+$border-radius: 8px;
+$box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$transition: all 0.15s ease-in-out;
+
+// Mixins
+@mixin card-style {
+  background: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  border: 1px solid $gray-200;
+}
+
+@mixin button-style {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: $transition;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Container
+.attendance-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+  background-color: $gray-50;
+  min-height: 100vh;
+}
+
+// Header
+.attendance-header {
+  margin-bottom: 32px;
+  
+  .page-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 28px;
+    font-weight: 700;
+    color: $gray-900;
+    margin: 0 0 8px 0;
+    
+    .icon-clock::before {
+      content: "🕐";
+      font-size: 24px;
+    }
+  }
+  
+  .page-subtitle {
+    font-size: 16px;
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+// Status Message
+.status-message {
+  @include card-style;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  
+  &.success {
+    background-color: #ecfdf5;
+    color: $success-color;
+    border-color: #a7f3d0;
+    
+    .status-icon::before {
+      content: "✓";
+      color: $success-color;
+    }
+  }
+  
+  &.error {
+    background-color: #fef2f2;
+    color: $error-color;
+    border-color: #fecaca;
+    
+    .status-icon::before {
+      content: "⚠";
+      color: $error-color;
+    }
+  }
+}
+
+// Clock Section
+.clock-section {
+  margin-bottom: 40px;
+}
+
+.clock-card {
+  @include card-style;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.current-status {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  
+  .status-indicator {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    
+    &.clocked-in {
+      background-color: #dcfce7;
+      border: 3px solid $success-color;
+      
+      .status-icon::before {
+        content: "▶";
+        color: $success-color;
+      }
+    }
+    
+    &.clocked-out {
+      background-color: $gray-100;
+      border: 3px solid $gray-300;
+      
+      .status-icon::before {
+        content: "⏸";
+        color: $gray-500;
+      }
+    }
+  }
+  
+  .status-text {
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0 0 4px 0;
+    }
+    
+    p {
+      font-size: 14px;
+      color: $gray-600;
+      margin: 0;
+    }
+  }
+}
+
+.clock-actions {
+  .btn {
+    @include button-style;
+    font-size: 16px;
+    padding: 16px 32px;
+    min-width: 150px;
+    
+    &.btn-clock-in {
+      background-color: $success-color;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background-color: #047857;
+        transform: translateY(-1px);
+      }
+    }
+    
+    &.btn-clock-out {
+      background-color: $warning-color;
+      color: white;
+      
+      &:hover:not(:disabled) {
+        background-color: #b45309;
+        transform: translateY(-1px);
+      }
+    }
+    
+    .btn-icon::before {
+      font-size: 18px;
+    }
+    
+    .icon-play::before {
+      content: "▶";
+    }
+    
+    .icon-stop::before {
+      content: "⏹";
+    }
+  }
+}
+
+// History Section
+.history-section {
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: $gray-900;
+      margin: 0;
+    }
+    
+    .btn-secondary {
+      @include button-style;
+      background-color: white;
+      color: $gray-700;
+      border: 1px solid $gray-300;
+      padding: 8px 16px;
+      font-size: 14px;
+      
+      &:hover:not(:disabled) {
+        background-color: $gray-50;
+        border-color: $gray-400;
+      }
+    }
+  }
+}
+
+// Loading States
+.loading-container {
+  @include card-style;
+  padding: 48px;
+  text-align: center;
+  
+  .loading-spinner {
+    font-size: 32px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// Table
+.attendance-table-container {
+  @include card-style;
+  overflow: hidden;
+}
+
+.empty-state {
+  padding: 64px 32px;
+  text-align: center;
+  
+  .icon-calendar::before {
+    content: "📅";
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+  }
+  
+  h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: $gray-900;
+    margin: 0 0 8px 0;
+  }
+  
+  p {
+    color: $gray-600;
+    margin: 0;
+  }
+}
+
+.attendance-table {
+  width: 100%;
+  
+  .table-header {
+    display: grid;
+    grid-template-columns: 120px 1fr 1fr 100px 120px;
+    background-color: $gray-50;
+    border-bottom: 1px solid $gray-200;
+    
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      display: none; // Hide headers on mobile, show them inline
+    }
+  }
+  
+  .header-cell {
+    padding: 16px;
+    font-weight: 600;
+    font-size: 14px;
+    color: $gray-700;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+  
+  .table-body {
+    .table-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 1fr 100px 120px;
+      border-bottom: 1px solid $gray-200;
+      transition: background-color 0.15s ease;
+      
+      &:hover {
+        background-color: $gray-50;
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 16px;
+        
+        .table-cell {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0 !important;
+          
+          &::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: $gray-700;
+          }
+        }
+      }
+    }
+  }
+  
+  .table-cell {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    
+    &.date {
+      justify-content: flex-start;
+    }
+    
+    &.time,
+    &.duration,
+    &.status {
+      justify-content: center;
+      
+      @media (max-width: 768px) {
+        justify-content: flex-end;
+      }
+    }
+  }
+}
+
+// Date Display
+.date-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  .day {
+    font-size: 20px;
+    font-weight: 700;
+    color: $gray-900;
+  }
+  
+  .month-year {
+    display: flex;
+    flex-direction: column;
+    
+    .month {
+      font-size: 12px;
+      font-weight: 500;
+      color: $gray-600;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+    
+    .year {
+      font-size: 12px;
+      color: $gray-500;
+      line-height: 1.2;
+    }
+  }
+}
+
+// Time Display
+.time-display {
+  font-family: monospace;
+  font-weight: 600;
+  color: $gray-900;
+  font-size: 14px;
+}
+
+.ongoing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: $warning-color;
+  font-weight: 500;
+  font-size: 14px;
+  
+  .icon-clock::before {
+    content: "🕐";
+    font-size: 12px;
+  }
+}
+
+// Duration Display
+.duration-display {
+  font-family: monospace;
+  font-weight: 600;
+  color: $gray-900;
+  font-size: 14px;
+}
+
+.duration-ongoing {
+  color: $gray-400;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+// Status Badge
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  
+  &.complete {
+    background-color: #dcfce7;
+    color: $success-color;
+    border: 1px solid #a7f3d0;
+    
+    .badge-icon::before {
+      content: "✓";
+    }
+  }
+  
+  &.ongoing {
+    background-color: #fef3c7;
+    color: $warning-color;
+    border: 1px solid #fde68a;
+    
+    .badge-icon::before {
+      content: "🕐";
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.icon-spinner::before {
+  content: "⟳";
+  display: inline-block;
+}
+
+.icon-refresh::before {
+  content: "⟳";
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .attendance-container {
+    padding: 16px;
+  }
+  
+  .attendance-header {
+    margin-bottom: 24px;
+    
+    .page-title {
+      font-size: 24px;
+    }
+  }
+  
+  .clock-card {
+    padding: 24px 20px;
+  }
+  
+  .current-status {
+    .status-indicator {
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+    }
+    
+    .status-text h3 {
+      font-size: 18px;
+    }
+  }
+  
+  .clock-actions .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+// Print Styles
+@media print {
+  .attendance-container {
+    background: white;
+    box-shadow: none;
+  }
+  
+  .clock-section,
+  .status-message,
+  .section-header button {
+    display: none;
+  }
+  
+  .attendance-table {
+    box-shadow: none;
+    border: 1px solid $gray-300;
+  }
+}

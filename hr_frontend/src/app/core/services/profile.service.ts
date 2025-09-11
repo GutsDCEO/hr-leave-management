@@ -11,7 +11,6 @@ export interface UserProfile {
     phone?: string;
     department?: string;
     position?: string;
-    employeeId?: string;
     avatarUrl?: string;
     preferences?: {
         emailNotifications?: boolean;
@@ -41,7 +40,8 @@ export interface UpdatePreferencesDto {
 
 @Injectable({ providedIn: 'root' })
 export class ProfileService {
-    private readonly baseUrl = `${environment.apiUrl}/api/users/me`;
+    // Corrected base URL to align with backend endpoint
+    private readonly baseUrl = `${environment.apiUrl}/api/user/profile`;
     private profile$ = new ReplaySubject<UserProfile>(1);
 
     constructor(private http: HttpClient) { }
@@ -63,11 +63,13 @@ export class ProfileService {
     }
 
     changePassword(dto: ChangePasswordDto): Observable<void> {
-        return this.http.post<void>(`${this.baseUrl}/change-password`, dto);
+        // Updated to use the new endpoint structure, assuming a change-password endpoint under /api/user/
+        return this.http.post<void>(`${environment.apiUrl}/api/user/change-password`, dto);
     }
 
     updatePreferences(dto: UpdatePreferencesDto): Observable<UserProfile> {
-        return this.http.patch<UserProfile>(`${this.baseUrl}/preferences`, dto).pipe(
+        // Updated to use the new endpoint structure, assuming a preferences endpoint under /api/user/
+        return this.http.patch<UserProfile>(`${environment.apiUrl}/api/user/preferences`, dto).pipe(
             tap(profile => this.profile$.next(profile))
         );
     }
