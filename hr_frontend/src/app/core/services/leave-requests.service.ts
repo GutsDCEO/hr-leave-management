@@ -1,5 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
@@ -26,17 +27,17 @@ export interface PageResponse {
 })
 export class LeaveRequestsService {
 
-  private apiUrl = 'http://localhost:8080/api/leaves'; // Adjust if needed
-  private employeeApiUrl = 'http://localhost:8080/api/employee/leaves'; // Employee-specific endpoint
+  private apiUrl = `${environment.apiUrl}/api/leaves`;
+  private employeeApiUrl = `${environment.apiUrl}/api/employee/leaves`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getLeaves(page = 0, size = 10, status?: string): Observable<PageResponse> {
     let params = new HttpParams()
       .set('page', page)
       .set('size', size);
     if (status) params = params.set('status', status);
-    
+
     return this.http.get<PageResponse>(this.apiUrl, { params }).pipe(
       tap(response => {
         console.log('Raw backend response:', response);
@@ -49,13 +50,13 @@ export class LeaveRequestsService {
       })
     );
   }
-  
+
   approveLeaveRequest(id: number, reviewer: string = 'admin'): Observable<LeaveRequest> {
     // Using HttpParams for POST with parameters
     const params = new HttpParams().set('reviewer', reviewer);
     return this.http.post<LeaveRequest>(`${this.apiUrl}/${id}/approve`, null, { params });
   }
-  
+
   rejectLeaveRequest(id: number, reviewer: string = 'admin', reason: string = 'Request rejected'): Observable<LeaveRequest> {
     // Using HttpParams for POST with parameters
     const params = new HttpParams()
@@ -70,7 +71,7 @@ export class LeaveRequestsService {
       .set('page', page)
       .set('size', size);
     if (status) params = params.set('status', status);
-    
+
     // In a real application, this would use the employee endpoint that automatically
     // filters for the current authenticated user
     // For now, we'll use the same endpoint as admin but in a real app this would be secured by role
@@ -79,5 +80,26 @@ export class LeaveRequestsService {
         console.log('Employee leave requests:', response);
       })
     );
+  }
+
+  // Method to get employee leave history with server-side filters
+  getEmployeeLeaveHistory(query: {
+    page: number;
+    size: number;
+    status?: string;
+    fromDate?: string;
+    toDate?: string;
+    sort?: string;
+  }): Observable<PageResponse> {
+    let params = new HttpParams()
+      .set('page', query.page)
+      .set('size', query.size)
+      .set('sort', query.sort ?? 'startDate,desc');
+
+    if (query.status) params = params.set('status', query.status);
+    if (query.fromDate) params = params.set('fromDate', query.fromDate);
+    if (query.toDate) params = params.set('toDate', query.toDate);
+
+    return this.http.get<PageResponse>(`${this.employeeApiUrl}/history`, { params });
   }
 }

@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '@angular/common';
@@ -8,6 +13,14 @@ import { LeaveService } from '../leave.service';
 
 @Component({
   selector: 'app-leave-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './leave-detail.component.html',
   styleUrls: ['./leave-detail.component.scss']
 })
@@ -22,7 +35,7 @@ export class LeaveDetailComponent implements OnInit {
     private leaveService: LeaveService,
     private snackBar: MatSnackBar,
     private location: Location
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.leaveId = this.route.snapshot.paramMap.get('id');
@@ -30,7 +43,7 @@ export class LeaveDetailComponent implements OnInit {
       this.loadLeaveRequest(this.leaveId);
     } else {
       this.snackBar.open('Invalid leave request ID', 'Close', { duration: 3000 });
-      this.router.navigate(['/leaves/list']);
+      this.router.navigate(['/employee/leaves/list']);
     }
   }
 
@@ -44,7 +57,7 @@ export class LeaveDetailComponent implements OnInit {
       error: (error) => {
         console.error('Error loading leave request:', error);
         this.snackBar.open('Failed to load leave request details', 'Close', { duration: 3000 });
-        this.router.navigate(['/leaves/list']);
+        this.router.navigate(['/employee/leaves/list']);
       }
     });
   }
@@ -82,7 +95,7 @@ export class LeaveDetailComponent implements OnInit {
     const end = new Date(endDate);
     let count = 0;
     const current = new Date(start);
-    
+
     while (current <= end) {
       const day = current.getDay();
       if (day !== 0 && day !== 6) {
@@ -90,17 +103,17 @@ export class LeaveDetailComponent implements OnInit {
       }
       current.setDate(current.getDate() + 1);
     }
-    
+
     return count;
   }
-  
+
   onBack(): void {
     this.location.back();
   }
 
   onCancelRequest(): void {
     if (!this.leaveId) return;
-    
+
     if (confirm('Are you sure you want to cancel this leave request?')) {
       this.leaveService.cancelLeaveRequest(this.leaveId).subscribe({
         next: () => {
@@ -118,7 +131,7 @@ export class LeaveDetailComponent implements OnInit {
   }
 
   canCancelRequest(): boolean {
-    return this.leaveRequest?.status === LeaveStatus.PENDING || 
-           this.leaveRequest?.status === LeaveStatus.APPROVED;
+    return this.leaveRequest?.status === LeaveStatus.PENDING ||
+      this.leaveRequest?.status === LeaveStatus.APPROVED;
   }
 }

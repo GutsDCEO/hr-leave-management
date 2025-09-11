@@ -38,7 +38,7 @@ interface LeaveRequest {
   selector: 'app-leave-list',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     RouterModule,
     FormsModule,
     MatButtonModule,
@@ -75,18 +75,35 @@ export class LeaveListComponent implements OnInit {
   totalPages = 0;
   currentPage = 0;
 
-  constructor(private router: Router, private leaveService: LeaveRequestsService) {}
+  constructor(private router: Router, private leaveService: LeaveRequestsService) { }
 
   ngOnInit(): void {
     this.loadLeaveRequests();
   }
 
+  private formatLocalDate(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   loadLeaveRequests(page = 0): void {
     this.loading = true;
-    this.leaveService.getEmployeeLeaveRequests(page, 10, this.statusFilter).subscribe({
+    const fromDate = this.startDateFilter ? this.formatLocalDate(this.startDateFilter) : undefined;
+    const toDate = this.endDateFilter ? this.formatLocalDate(this.endDateFilter) : undefined;
+
+    this.leaveService.getEmployeeLeaveHistory({
+      page,
+      size: 10,
+      status: this.statusFilter || undefined,
+      fromDate,
+      toDate,
+      sort: 'startDate,desc'
+    }).subscribe({
       next: (response) => {
         // Convert API response to our component's data structure
-        this.dataSource = response.content.map(item => {
+        const mapped = response.content.map(item => {
           return {
             id: item.id,
             startDate: item.startDate,
@@ -99,6 +116,8 @@ export class LeaveListComponent implements OnInit {
             requestDate: item.startDate
           };
         });
+        // Optional client-side type filter
+        this.dataSource = this.typeFilter ? mapped.filter(x => x.type === this.typeFilter) : mapped;
         this.totalPages = response.totalPages;
         this.currentPage = response.number;
         this.loading = false;
@@ -114,7 +133,7 @@ export class LeaveListComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.loadLeaveRequests();
+    this.loadLeaveRequests(0);
   }
 
   clearFilters(): void {
@@ -122,7 +141,7 @@ export class LeaveListComponent implements OnInit {
     this.typeFilter = '';
     this.startDateFilter = null;
     this.endDateFilter = null;
-    this.loadLeaveRequests();
+    this.loadLeaveRequests(0);
   }
 
   onNewRequest(): void {

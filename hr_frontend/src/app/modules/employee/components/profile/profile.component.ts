@@ -17,6 +17,7 @@ import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { ProfileService, UserProfile } from '../../../../core/services/profile.service';
 
 @Component({
   selector: 'app-profile',
@@ -57,7 +58,7 @@ export class ProfileComponent implements OnInit {
   loading: boolean = true;
   error: string | null = null;
 
-  constructor(private fb: FormBuilder, private snackBar: MatSnackBar) {
+  constructor(private fb: FormBuilder, private snackBar: MatSnackBar, private profileService: ProfileService) {
     this.initializeForms();
   }
 
@@ -93,7 +94,7 @@ export class ProfileComponent implements OnInit {
     this.loadProfile();
   }
 
-  private passwordMatchValidator(group: FormGroup): {[key: string]: any} | null {
+  private passwordMatchValidator(group: FormGroup): { [key: string]: any } | null {
     const newPassword = group.get('newPassword');
     const confirmPassword = group.get('confirmPassword');
     return newPassword && confirmPassword && newPassword.value === confirmPassword.value
@@ -104,26 +105,32 @@ export class ProfileComponent implements OnInit {
   loadProfile(): void {
     this.loading = true;
     this.error = null;
-    
-    setTimeout(() => {
-      try {
-        const profileData = {
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          phone: '1234567890',
-          department: 'Engineering',
-          position: 'Software Engineer',
-          employeeId: 'EMP001'
-        };
-        
-        this.profileForm.patchValue(profileData);
+    this.profileService.getMe().subscribe({
+      next: (profile: UserProfile) => {
+        this.profileForm.patchValue({
+          firstName: profile.firstName || '',
+          lastName: profile.lastName || '',
+          email: profile.email || '',
+          phone: profile.phone || '',
+          department: profile.department || '',
+          position: profile.position || '',
+          employeeId: profile.employeeId || ''
+        });
+        this.avatarUrl = profile.avatarUrl || this.avatarUrl;
+        if (profile.preferences) {
+          this.preferencesForm.patchValue({
+            emailNotifications: profile.preferences.emailNotifications ?? true,
+            language: profile.preferences.language ?? 'en',
+            theme: profile.preferences.theme ?? 'light'
+          });
+        }
         this.loading = false;
-      } catch (err) {
+      },
+      error: () => {
         this.error = 'Failed to load profile data';
         this.loading = false;
       }
-    }, 1000);
+    });
   }
 
   onAvatarChange(event: Event): void {

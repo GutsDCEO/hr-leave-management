@@ -9,7 +9,7 @@ import { MatRippleModule } from '@angular/material/core';
   selector: 'app-employee-sidebar',
   standalone: true,
   imports: [
-    CommonModule, 
+    CommonModule,
     RouterModule,
     MatIconModule,
     MatListModule,
@@ -21,12 +21,7 @@ import { MatRippleModule } from '@angular/material/core';
 export class EmployeeSidebarComponent {
   menuItems = [
     {
-      path: '/employee/dashboard',
-      icon: 'dashboard',
-      label: 'Dashboard'
-    },
-    {
-      path: '/employee/leaves',
+      path: '/employee/leaves/list',
       icon: 'event_note',
       label: 'My Leave'
     },
